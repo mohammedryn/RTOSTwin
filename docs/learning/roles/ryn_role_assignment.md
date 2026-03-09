@@ -54,6 +54,21 @@
 
 ---
 
+## 🤝 Integration Contract (Do Not Break)
+
+1. **Single-owner rule (no overlap):**
+    - RYN owns: `agent/core/snapshot.*`, `agent/core/profiler.*`, `docs/wire_format_spec.md`, `agent/core/wire_format.h`, `bridge/decoder.py`, `bridge/oom_analyzer.py`
+    - VNV owns: `agent/core/framer.*`, `agent/core/encoder.*`, `agent/core/transport.*`, `agent/hal/stm32/uart_dma.c`, `bridge/prometheus_exporter.py`, `bridge/otlp_exporter.py`, `bridge/device_registry.py`, `bridge/main.py`, `bridge/mock_device.py`, `dashboard/rtostwin_dashboard.json`
+2. **Protocol freeze gate:** `docs/wire_format_spec.md` + `agent/core/wire_format.h` must be frozen as `v1` by end of Week 3 and approved by both engineers.
+3. **No breaking protocol change on main:** if packet layout, enum values, field sizes, CRC settings, or delta tags change, bump `WF_PROTOCOL_VERSION` and add backward-compat notes before merge.
+4. **Merge gate (required):** every merge touching protocol/framing/decoder must pass:
+    - 3 golden packet vectors (byte-for-byte exact)
+    - Decoder compatibility test for current protocol version
+    - End-to-end mock stream test (`mock_device.py` -> `decoder.py`)
+5. **Branch policy:** no direct commits to main for protocol or decoder/framer changes; use PR with both engineers as reviewers.
+
+---
+
 ## 📋 Deliverables — C Firmware Side (agent/)
 
 These files run **on the microcontroller (STM32F4 or ESP32)**. Written in **C99**. No C++, no stdlib heap functions.
@@ -277,7 +292,7 @@ void telemetry_task(void *param) {
 
 ## 📋 Deliverables — Python Bridge Side (bridge/)
 
-Runs on a **PC or Raspberry Pi**. Python 3.9+. You can develop and test this entirely without the MCU by writing a `mock_device.py` that emits correctly-framed binary packets.
+Runs on a **PC or Raspberry Pi**. Python 3.9+. You can develop and test this entirely without the MCU using the shared `bridge/mock_device.py` owned by VNV.
 
 ---
 
@@ -487,33 +502,10 @@ pytest test_oom_analyzer.py::test_stable_no_alert
 
 ---
 
-### Deliverable 6 — Mock Device Generator *(Start Immediately)*
-**File:** `bridge/mock_device.py`
-
-**What it does:**  
-Generates a realistic binary packet stream that follows the wire format spec exactly. Used to develop and test all Python deliverables (decoder, Prometheus endpoint, OTLP exporter, OOM analyzer) **without needing physical hardware**. Kill your own blockers.
-
-```python
-"""
-mock_device.py — RTOSTwin mock packet generator.
-Emits correctly framed binary packets to stdout or a TCP socket.
-Simulates a 4-task FreeRTOS device with controlled heap behavior.
-
-Usage:
-    python mock_device.py --mode normal        # Steady state
-    python mock_device.py --mode leak          # Controlled 10 bytes/sec heap leak
-    python mock_device.py --mode saturated     # All tasks running at 100% CPU
-    python mock_device.py --output tcp:5555    # Emit to TCP socket
-    python mock_device.py --output stdout      # Pipe to bridge: python mock_device.py | python main.py
-"""
-```
-
----
-
 ## 🚧 Critical Constraints (Apply to ALL Your Deliverables)
 
 1. **Zero dynamic allocation in C firmware.** `malloc` and `pvPortMalloc` are absolutely forbidden inside `snapshot_capture()` and `profiler_record()`. Violating this causes priority inversion. This is not negotiable.
-2. **`volatile` on every ISR-shared variable.** The idle hook counter `s_idle_cycle_count` is written by the idle task (IRQ-level) and read by `snapshot_capture()`. It must be `volatile`. Without it, the optimizer eliminates the read.
+2. **`volatile` on every cross-context shared variable.** The idle hook counter `s_idle_cycle_count` is written in idle task context and read by `snapshot_capture()`. It must be `volatile`. Without it, the optimizer can cache or eliminate reads.
 3. **Critical sections must be minimal.** The critical section inside `snapshot_capture()` disables IRQs. Keep it under 50 µs. Do not do any computation (CRC, encoding) inside the critical section — only the raw reads.
 4. **Python decoder must be stateful and stream-safe.** Never assume a `read()` call aligns with packet boundaries. Feed one byte at a time in your state machine.
 5. **OOM analyzer defaults must be conservative.** A false positive OOM alert from a deployed device that causes an engineer to fly out to a field site at 2 AM is infinitely worse than a missed alert. Keep `min_r_squared` at 0.7 and `rolling_min_threshold` at 10% by default. Make both configurable.
@@ -540,7 +532,7 @@ Your role is complete when every item in this checklist is checked off:
 - [ ] OOM analyzer detects a 1 byte/sec monotonic leak within 60 seconds — pytest
 - [ ] OOM analyzer detects sawtooth leak with 5% net decrease per window — pytest
 - [ ] Zero false positive OOM alerts over 3600 steady-state mock samples — pytest
-- [ ] `mock_device.py` runs independently and produces parseable binary output in both `--mode normal` and `--mode leak`
+- [ ] Decoder integration passes against shared `bridge/mock_device.py` in both `--mode normal` and `--mode leak`
 
 ---
 
@@ -549,12 +541,13 @@ Your role is complete when every item in this checklist is checked off:
 | What You Need | Who Provides It | When |
 |---|---|---|
 | `full_snapshot_t` struct — from yourself | You defined it in `snapshot.h` | Week 3 |
-| Wire format byte layout | **You define it** → partner uses it | **Week 3 — you go first** |
+| Wire format byte layout | **You define it** -> partner uses it | **Week 3 — you go first** |
 | CRC test vectors | **You define them** in wire format spec | Week 3 |
+| Shared mock packet stream (`bridge/mock_device.py`) | Partner (VNV) | Week 4 |
 | DMA transport working (to test end-to-end) | Partner (Deliverable: DMA transport) | Week 5 |
 | Prometheus endpoint live (to feed OOM data into Grafana) | Partner (Deliverable: Prometheus) | Week 10 |
 
-> **Write `mock_device.py` in Week 1.** You do not need hardware to build and test the entire Python bridge side. Define the wire format, write the mock, develop the decoder against it. By the time partner's C framer is running on hardware, your decoder will already be fully tested.
+> Use partner-owned `bridge/mock_device.py` from Week 4 onward for decoder and OOM integration tests. Do not fork protocol behavior in a second local mock.
 
 ---
 
@@ -565,7 +558,7 @@ Your role is complete when every item in this checklist is checked off:
 | `snapshot_capture()` compiles, prints to UART | Week 3 | Visual verify of UART output |
 | Wire format spec finalized + `wire_format.h` committed | **Week 3** | **Both engineers sign off before Week 4** |
 | `snapshot_capture()` WCET < 150 µs — measured | Week 4 | `profiler_report()` printed over 10,000 calls |
-| `mock_device.py` functional | Week 4 | Produces parseable packets in both modes |
+| Decoder + shared mock integration functional | Week 4 | `bridge/mock_device.py` parses in both modes |
 | Python decoder passes all pytest cases | Week 5 | `pytest test_decoder.py` green |
 | End-to-end: MCU → UART → decoder → decoded struct in Python | Week 6 | First live data from real device |
 | OOM analyzer passes all pytest cases | Week 12 | All 4 OOM test gates pass |

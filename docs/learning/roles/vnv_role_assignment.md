@@ -43,6 +43,21 @@
 
 ---
 
+## 🤝 Integration Contract (Do Not Break)
+
+1. **Single-owner rule (no overlap):**
+      - VNV owns: `agent/core/framer.*`, `agent/core/encoder.*`, `agent/core/transport.*`, `agent/hal/stm32/uart_dma.c`, `bridge/prometheus_exporter.py`, `bridge/otlp_exporter.py`, `bridge/device_registry.py`, `bridge/main.py`, `bridge/mock_device.py`, `dashboard/rtostwin_dashboard.json`
+      - RYN owns: `agent/core/snapshot.*`, `agent/core/profiler.*`, `docs/wire_format_spec.md`, `agent/core/wire_format.h`, `bridge/decoder.py`, `bridge/oom_analyzer.py`
+2. **Decoder ownership is fixed:** do not implement a second decoder/parser inside exporter modules; consume `DecodedPacket` from `bridge/decoder.py`.
+3. **Protocol freeze gate:** `docs/wire_format_spec.md` + `agent/core/wire_format.h` must be frozen as `v1` by end of Week 3 and approved by both engineers.
+4. **No breaking protocol change on main:** if packet layout, enum values, field sizes, CRC settings, or delta tags change, bump `WF_PROTOCOL_VERSION` and add backward-compat notes before merge.
+5. **Merge gate (required):** every merge touching protocol/framing/decoder must pass:
+      - 3 golden packet vectors (byte-for-byte exact)
+      - Decoder compatibility test for current protocol version
+      - End-to-end mock stream test (`mock_device.py` -> `decoder.py`)
+
+---
+
 ## 📋 Deliverables — C Firmware Side (agent/)
 
 These files run **on the microcontroller**. Written in C99. Target: STM32F4 (ARM Cortex-M4 @ 168 MHz), later ESP32.
@@ -232,6 +247,23 @@ A ready-to-import Grafana dashboard JSON that works out-of-the-box with Promethe
 
 ---
 
+### Deliverable 8 — Shared Mock Device Generator
+**File:** `bridge/mock_device.py`
+
+**What it does:**
+Generates the canonical binary packet stream for integration testing without hardware. This is the only mock stream implementation used by both engineers for decoder, exporter, and dashboard validation.
+
+**Required modes:**
+- `--mode normal`
+- `--mode leak`
+- `--mode saturated`
+
+**Verification gate:**
+- `bridge/mock_device.py` output is parseable by partner-owned `bridge/decoder.py` in all required modes.
+- Golden packet vectors generated from this tool match `wire_format.h` and `wire_format_spec.md`.
+
+---
+
 ## 🚧 Critical Constraints (Apply to ALL Your Deliverables)
 
 1. **Zero dynamic allocation in C firmware.** `malloc` and `pvPortMalloc` are forbidden inside any function you write in the agent. Use `static` buffers.
@@ -259,6 +291,7 @@ Your role is complete when every item in this checklist is checked off:
 - [ ] OTLP exporter sends metrics without error to a local OTel Collector — integration test
 - [ ] Two simultaneous devices produce non-contaminated metrics — integration test
 - [ ] Grafana dashboard imports and displays live data from a real device
+- [ ] `bridge/mock_device.py` produces parseable streams for `normal`, `leak`, and `saturated` modes
 
 ---
 
@@ -268,10 +301,10 @@ Your role is complete when every item in this checklist is checked off:
 |---|---|---|
 | `full_snapshot_t` struct definition | Partner (snapshot engine) | Week 3 |
 | Wire format byte layout spec | Partner (wire format spec, Week 3) | Week 3 |
-| Mock packet data (for Python dev) | You — write a `mock_device.py` generator | Immediately |
+| Mock packet data (for Python dev) | You own and maintain `bridge/mock_device.py` | Immediately |
 | Prometheus running locally (testing) | You — `docker run prom/prometheus` | Phase 3 start |
 
-> **Start the Python bridge immediately using mock packet data.** You do not need the physical MCU to build and test Deliverables 4–7. Write `mock_device.py` that generates fake but correctly framed binary packets, feed it into your decoder, and build the entire bridge in parallel.
+> **Start the Python bridge immediately using mock packet data.** You do not need the physical MCU to build and test Deliverables 4–8. Maintain a single canonical `bridge/mock_device.py` used by both engineers to prevent integration drift.
 
 ---
 
@@ -280,6 +313,7 @@ Your role is complete when every item in this checklist is checked off:
 | Milestone | Target Week | Gate |
 |---|---|---|
 | Packet framer + CRC unit tests pass | Week 4 | Wire format spec received |
+| Shared `mock_device.py` ready for both tracks | Week 4 | Partner decoder parses all required modes |
 | DMA transport verified on hardware | Week 5 | < 0.1% packet loss |
 | Delta encoder verified | Week 7 | > 10x compression measured |
 | Prometheus endpoint live | Week 10 | Grafana shows mock device data |
