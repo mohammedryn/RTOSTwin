@@ -59,7 +59,7 @@ Read this section once and never forget it. Every file has exactly one job.
 - The full system diagram showing how data flows from the MCU all the way to Grafana
 - Which module is responsible for what (snapshot → encoder → framer → transport on the C side)
 - The exact data flow on both the C side and Python side as a step-by-step pipeline
-- Transport options (UART DMA vs WiFi TCP)
+- Transport options (UART DMA vs USB CDC vs UDP)
 - Bandwidth budget (why delta encoding is mandatory)
 - How failure cases are handled (DMA busy, CRC fail, serial disconnect)
 - Security limitations
@@ -320,9 +320,9 @@ Gate: [how to verify the task is done correctly]
 Follow @AI_WORKFLOW_RULES.md (5-step cycle, one chunk at a time).
 Follow @CODING_RULES.md for all code.
 
-Task: Create `agent/core/framer.h` and `agent/core/framer.c`.
+Task: Create `agent/core/framer.h` first, then `agent/core/framer.c` in the next chunk.
 Implement `crc16_ccitt()` exactly as specified in @TECH_SPEC.md Section 2.3.
-Also implement `frame_packet()` as specified in Section 3.3.
+Also implement `frame_packet()` as specified in Section 3.3, including `packet_type` and `timestamp_ticks`.
 All buffers are static. No malloc.
 
 After each chunk, wait for my permission before the next one.
@@ -453,7 +453,7 @@ Wait for my permission.
 **Prompt for C tests:**
 
 ```
-Read @ТЕХSPEC.md for the exact test vectors (e.g., crc16_ccitt("123456789") == 0x29B1).
+Read @TECH_SPEC.md for the exact test vectors (e.g., crc16_ccitt("123456789") == 0x29B1).
 Read @CODING_RULES.md §5 for the testing requirements.
 
 I need tests for `crc16_ccitt()` and `frame_packet()` using the Unity framework.
@@ -495,7 +495,7 @@ Fix only that field. Explain where the field comes from and what it measures.
 ```
 Stop. Your function signature is wrong.
 Check @TECH_SPEC.md Section 3.3. The correct signature is:
-`uint16_t frame_packet(const uint8_t *payload, uint16_t payload_len, uint8_t *out_buf, uint16_t out_buf_size);`
+`uint16_t frame_packet(const uint8_t *payload, uint16_t payload_len, uint8_t packet_type, uint32_t timestamp_ticks, uint8_t *out_buf, uint16_t out_buf_size);`
 You changed the parameter names and types. Rewrite only the signature.
 Explain what each parameter is and what the return value means.
 ```
@@ -527,7 +527,7 @@ Delete your output. Explain what the actual correct next module to write is.
 
 > "Here is how to get started on your assigned deliverables:"
 >
-> 1. **Read your role document** (e.g., `vnv_role_assignment.md`) to understand exactly what you own.
+> 1. **Read your role document** (e.g., `PRD/roles/vnv_role_assignment.md`) to understand exactly what you own.
 > 2. **Read `TASK_QUEUE.md`**. Find the tasks that match your deliverables. Your tasks are the relevant numbered tasks in the queue.
 > 3. **Open your AI IDE.** At the start of every session, attach: `AI_WORKFLOW_RULES.md`, `CODING_RULES.md`.
 > 4. **For any coding task, also attach:** `TECH_SPEC.md` (for exact struct/function specs) and `FILE_STRUCTURE.md` (for correct file paths).

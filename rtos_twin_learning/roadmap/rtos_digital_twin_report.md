@@ -5,8 +5,8 @@
 
 **Project Title:** RTOSTwin - Real-Time Operating System Digital Twin Framework  
 **Target Domain:** Embedded Systems Infrastructure, Industrial IoT, Predictive Maintenance  
-**Platforms:** FreeRTOS, Zephyr, ThreadX, Azure RTOS, Embedded Linux (RT-PATCH)  
-**Hardware:** ARM Cortex-M, Cortex-A, RISC-V, ESP32, STM32, nRF52, Industrial MCUs  
+**Platforms:** V1 focus: FreeRTOS (STM32Cube, ESP-IDF FreeRTOS, Teensy/i.MX RT1062); planned expansion: Zephyr, ThreadX/Azure RTOS, Embedded Linux (RT-PATCH)  
+**Hardware:** Reference demos: NUCLEO-F401RE, ESP32-P4-Function-EV-Board, Teensy 4.1; scalable to Cortex-M, Cortex-A, and RISC-V MCUs  
 **Development Timeline:** 6 Months (180 hours @ 1hr/day)  
 **Complexity Level:** Staff Engineer / Principal Engineer Level  
 **Innovation Factor:** Novel research-level work (publishable)
@@ -288,31 +288,31 @@ Modern embedded systems running RTOS are increasingly complex, yet debugging and
 
 #### Month 1-2: Foundation
 **Deliverables:**
-- Core telemetry agent for FreeRTOS (STM32)
-- Basic state mirroring (tasks, memory, CPU)
-- Local PC twin (C++ simulation)
-- Proof-of-concept demo
+- Portable telemetry agent architecture for FreeRTOS reference boards
+- STM32F401RE hardware demo (tasks, memory, CPU)
+- ESP32-P4 and Teensy 4.1 board bring-up on the shared protocol/transport stack
+- Local PC twin (C++ simulation / host bridge) with a proof-of-concept dashboard
 
 **Success Criteria:**
-- Twin mirrors physical device with < 5ms lag
-- Overhead < 5% CPU, < 20KB RAM
-- Demonstrates task state tracking
+- Twin mirrors physical device with < 5ms lag on the STM32F401RE reference setup
+- Overhead < 5% CPU, < 20KB RAM on the baseline single-core board
+- Demonstrates task state tracking over real hardware links (UART or USB CDC) on all three reference boards
 
 #### Month 3-4: Advanced Features
 **Deliverables:**
 - Predictive memory leak detection
 - Stack overflow prediction
 - Time-travel debugging (record/replay)
-- Web-based visualization dashboard
+- Web-based visualization dashboard with device metadata and multi-board comparison
 
 **Success Criteria:**
 - Detects memory leak 1+ hour before crash
 - Stack overflow warning 30+ minutes early
-- Dashboard shows real-time twin state
+- Dashboard shows real-time twin state for both single-core and dual-core targets
 
 #### Month 5-6: Production Hardening
 **Deliverables:**
-- Multi-platform support (Zephyr, ESP-IDF)
+- Three-board hardware showcase and polished demo script
 - Optimization (< 2% overhead target)
 - Comprehensive testing suite
 - Documentation and examples
@@ -320,9 +320,9 @@ Modern embedded systems running RTOS are increasingly complex, yet debugging and
 
 **Success Criteria:**
 - Passes 100+ unit tests
-- Works on Cortex-M0+ with 16KB RAM
+- Live demo across STM32F401RE, ESP32-P4, and Teensy 4.1
 - Published technical blog post
-- GitHub repo with examples
+- GitHub repo with board-specific examples
 
 ---
 
@@ -1209,6 +1209,46 @@ RTOSTwin/
     └── industrial_monitor/   # Production use case
 ```
 
+### V1 Board Generalization Strategy
+
+To make the framework portable without overfitting it to one MCU family, the first implementation should treat the three demo targets as three platform classes:
+
+- **STM32F401RE** = STM32Cube + FreeRTOS + Cortex-M4
+- **ESP32-P4** = ESP-IDF FreeRTOS + dual-core RISC-V
+- **Teensy 4.1** = i.MX RT1062 / Teensy ecosystem + Cortex-M7
+
+The agent should therefore be structured as layered building blocks instead of a single STM32-shaped code path:
+
+```text
+agent/
+  core/                  # snapshot model, encoder, framing, common telemetry loop
+  rtos_port/
+    freertos_generic/    # vanilla FreeRTOS targets (STM32F401RE, Teensy 4.1)
+    esp_idf_freertos/    # ESP32-P4 specific SMP integration
+  platform/
+    cortex_m/            # DWT/runtime counter helpers
+    esp32p4/             # ESP-IDF timer/cycle counter helpers
+    imxrt1062/           # Teensy 4.1 platform helpers
+  board/
+    nucleo_f401re/       # board pins, clocks, default transport
+    esp32_p4_function_ev/
+    teensy41/
+  transport/
+    stream_uart/
+    stream_usb_cdc/
+    stream_udp/
+```
+
+**Reference hardware targets (v1):**
+
+| Board | RTOS / BSP path | Default demo transport | Why it is included |
+|-------|------------------|------------------------|--------------------|
+| NUCLEO-F401RE | STM32Cube + FreeRTOS | UART via ST-LINK Virtual COM Port | Low-risk baseline and easiest first hardware demo |
+| ESP32-P4-Function-EV-Board | ESP-IDF FreeRTOS (SMP) | USB CDC or Ethernet | Flagship modern demo with dual-core telemetry |
+| Teensy 4.1 | FreeRTOS on i.MX RT1062 / Teensy ecosystem | USB CDC first | High-performance portability proof |
+
+**Transport scope for v1:** UART, USB CDC, and UDP/Ethernet are the official transports. BLE and LPWAN transports are better treated as later extensions after the byte-stream protocol is stable across the three reference boards.
+
 ---
 
 ## Digital Twin Core Components
@@ -1221,7 +1261,7 @@ RTOSTwin/
 
 **Responsibilities:**
 - Capture RTOS state at configurable rate (1-100 Hz)
-- Minimize overhead (< 100 µs per snapshot)
+- Minimize overhead (< 200 µs per snapshot on the baseline board)
 - Thread-safe (can snapshot while tasks running)
 
 **State Categories:**
@@ -1296,7 +1336,7 @@ void snapshot_capture(full_snapshot_t* snapshot) {
     taskENTER_CRITICAL();
     
     // 3. Capture task states from RTOS
-    TaskStatus_t* task_status = malloc(MAX_TASKS * sizeof(TaskStatus_t));
+    static TaskStatus_t task_status[MAX_TASKS];
     UBaseType_t num_tasks = uxTaskGetSystemState(task_status, 
                                                   MAX_TASKS, 
                                                   NULL);
@@ -1329,10 +1369,10 @@ void snapshot_capture(full_snapshot_t* snapshot) {
     // 8. Calculate CRC
     snapshot->crc16 = crc16_calculate((uint8_t*)snapshot, 
                                       sizeof(full_snapshot_t) - 2);
-    
-    free(task_status);
 }
 ```
+
+**Portability Note:** The hot snapshot path must avoid dynamic allocation and board-specific assumptions. Static scratch buffers and board-specific hooks make the same capture flow usable on STM32F401RE, ESP32-P4, and Teensy 4.1.
 
 **Optimization: Selective Snapshot**
 
@@ -1418,6 +1458,8 @@ At 10 Hz update rate:
   Delta: 200 bytes/sec (17.5x less bandwidth!)
 ```
 
+**Wire Format Requirement:** The transport payload should serialize fields explicitly rather than copying raw C structs onto the wire. That keeps packets stable across Cortex-M, RISC-V, different compilers, and different alignment rules.
+
 #### Transport Layer
 
 **Purpose:** Reliable transmission over unreliable links
@@ -1427,7 +1469,7 @@ At 10 Hz update rate:
 ```c
 typedef struct {
     uint8_t sync_bytes[2];      // 0xAA, 0x55 (packet start marker)
-    uint8_t packet_type;        // FULL_SNAPSHOT | DELTA | ACK | COMMAND
+    uint8_t packet_type;        // DEVICE_INFO | FULL_SNAPSHOT | DELTA | ACK | COMMAND
     uint16_t sequence_num;      // For ordering and loss detection
     uint64_t timestamp_us;      // Device timestamp
     uint16_t payload_length;    // Bytes following this field
@@ -1435,6 +1477,14 @@ typedef struct {
     uint16_t crc16;             // Checksum (CRC-16-CCITT)
 } packet_t;
 ```
+
+At boot (and after reconnect), each device should first emit a `DEVICE_INFO` packet containing board name, MCU family, RTOS type, core count, tick rate, runtime-counter frequency, transport type, and protocol version. This lets the bridge and dashboard normalize metrics such as stack usage in bytes, timestamp units, and per-core CPU utilization.
+
+For the first end-to-end release, the transport layer should standardize on:
+
+- **STM32F401RE:** UART over the on-board ST-LINK Virtual COM Port
+- **ESP32-P4:** USB CDC or Ethernet for the public demo, with UART1-UART4 reserved for application serial if needed
+- **Teensy 4.1:** USB CDC (`Serial`) first, with hardware UART (`Serial1`-`Serial8`) or Ethernet as optional follow-ons
 
 **Transmission Strategy:**
 
@@ -1451,7 +1501,7 @@ void transmit_task(void* param) {
             // Send packet from queue
             packet_t* pkt = &tx_queue[tx_tail];
             
-            // Send over UART/WiFi/etc.
+            // Send over UART/USB CDC/UDP backend
             send_bytes((uint8_t*)pkt, sizeof(packet_header_t) + pkt->payload_length);
             
             // Wait for ACK or timeout
@@ -2382,26 +2432,26 @@ Color scale:
 
 ## Implementation Timeline (6 Months)
 
-### Month 1: Foundation & Proof-of-Concept
+### Month 1: Foundation & STM32F401RE Proof-of-Concept
 
-**Week 1: Agent Core (STM32 + FreeRTOS)**
-- Day 1-2: Project setup, build system (STM32CubeIDE + FreeRTOS)
-- Day 3-4: Implement snapshot capture (tasks, memory)
-- Day 5-6: Test overhead measurement (goal: < 5%)
+**Week 1: Canonical Agent Core (FreeRTOS baseline)**
+- Day 1-2: Project setup and board-neutral build layout
+- Day 3-4: Implement snapshot capture (tasks, memory, CPU) with static buffers
+- Day 5-6: Add explicit serialization, framing, and CRC
 - Day 7: Validate correctness vs RTOS state
 
-**Deliverable:** Agent captures and prints snapshots via UART
+**Deliverable:** Agent captures and prints snapshots on the NUCLEO-F401RE via ST-LINK VCP
 
-**Week 2: Transport & Encoding**
+**Week 2: Transport & Host Baseline**
 - Day 1-2: Implement delta encoder
 - Day 3-4: UART packet transmission with CRC
-- Day 5-6: Receive snapshots on PC (Python script)
+- Day 5-6: Receive snapshots on PC (Python bridge)
 - Day 7: Test reliability (packet loss, corruption)
 
 **Deliverable:** Reliable telemetry stream to PC
 
 **Week 3: Basic Twin (PC-side)**
-- Day 1-3: Parse snapshots into twin state (C++)
+- Day 1-3: Parse snapshots into twin state (C++ / Python host)
 - Day 4-5: Simple scheduler simulator
 - Day 6-7: Synchronization logic (match twin to device)
 
@@ -2409,32 +2459,34 @@ Color scale:
 
 **Week 4: Visualization v1**
 - Day 1-3: Web server (Node.js + WebSocket)
-- Day 4-5: Basic dashboard (task list, memory bar)
+- Day 4-5: Basic dashboard (task list, memory bar, device metadata)
 - Day 6-7: Real-time updates from twin
 
-**Deliverable:** 🎬 **DEMO 1**: Live dashboard showing tasks and memory
+**Deliverable:** 🎬 **DEMO 1**: Live STM32F401RE dashboard showing tasks and memory
 
-### Month 2: Advanced Features
+### Month 2: Board Generalization
 
-**Week 5: Predictive Analytics v1**
-- Day 1-3: Memory leak detector (linear regression)
-- Day 4-5: Stack overflow predictor
-- Day 6-7: Alert system
+**Week 5: ESP32-P4 Port**
+- Day 1-2: Add ESP-IDF FreeRTOS integration layer
+- Day 3-4: Implement per-core telemetry and profiler backend
+- Day 5-6: Bring up USB CDC or Ethernet transport
+- Day 7: Validate host decoding and dashboard labels
 
-**Deliverable:** Alerts trigger when leaks/overflows predicted
+**Deliverable:** 🎬 **DEMO 2**: ESP32-P4 live telemetry on hardware
 
-**Week 6: Time-Travel v1**
-- Day 1-3: State recorder (circular buffer)
-- Day 4-5: Replay engine
-- Day 6-7: UI for timeline scrubbing
+**Week 6: Teensy 4.1 Port**
+- Day 1-2: Add i.MX RT1062 / Teensy board support layer
+- Day 3-4: Bring up USB CDC transport and runtime profiling
+- Day 5-6: Validate task, memory, and CPU metrics
+- Day 7: Compare output against STM32 baseline
 
-**Deliverable:** Can "rewind" to past states
+**Deliverable:** 🎬 **DEMO 3**: Teensy 4.1 live telemetry on hardware
 
-**Week 7-8: Multi-Platform Support**
-- Week 7: Zephyr RTOS integration
-- Week 8: ESP-IDF (ESP32) integration
+**Week 7-8: Multi-Board Unification**
+- Week 7: Normalize device metadata, stack units, and timestamp semantics
+- Week 8: Add device filtering and side-by-side comparison in the dashboard
 
-**Deliverable:** Works on STM32, ESP32, nRF52
+**Deliverable:** Works on STM32F401RE, ESP32-P4, and Teensy 4.1
 
 ### Month 3: Production Hardening
 
@@ -2643,20 +2695,22 @@ With this project:
 
 | Item | Purpose | Cost | Link |
 |------|---------|------|------|
-| STM32F4 Discovery | Primary dev board | $25 | ST.com |
-| ESP32 DevKit | WiFi connectivity test | $10 | |
-| nRF52840 DK | BLE testing | $45 | Nordic |
-| USB-UART Adapter | Initial comm | $8 | |
+| NUCLEO-F401RE | Baseline FreeRTOS reference board | $15 | ST.com |
+| ESP32-P4-Function-EV-Board | Dual-core ESP-IDF reference board | $35 | Espressif |
+| Teensy 4.1 | High-performance portability target | $31 | PJRC |
+| USB-UART Adapter (optional) | Extra UART bring-up and debug | $8 | |
 | Logic Analyzer | Protocol debug | $20 | Saleae compatible |
-| **Total** | | **~$108** | |
+| Ethernet cable / adapter (optional) | ESP32-P4 or Teensy network demo | $10 | |
+| **Total** | | **~$109-$119** | |
 
 ### Appendix B: Software Stack
 
 **Embedded (Agent):**
 - FreeRTOS 10.5+
-- Zephyr RTOS 3.0+
-- STM32 HAL
-- ESP-IDF
+- STM32Cube HAL / STM32CubeIDE
+- ESP-IDF (ESP32-P4 FreeRTOS SMP port)
+- Teensyduino or PlatformIO for Teensy 4.1
+- UART, USB CDC, and UDP transport backends
 
 **Twin (PC/Server):**
 - C++17 (simulator core)
@@ -2674,23 +2728,31 @@ With this project:
 - TensorFlow Lite
 - numpy, scipy
 
-### Appendix C: Performance Benchmarks
+### Appendix C: Performance Targets for Reference Boards
 
-**Agent Overhead (STM32F4 @ 168MHz):**
-- Snapshot capture: 85 µs
-- Delta encoding: 12 µs
-- UART transmission: 150 µs (background DMA)
-- Total per cycle: ~100 µs @ 10 Hz = 0.1% CPU
+**STM32F401RE (84MHz Cortex-M4):**
+- Snapshot + encode target: < 200 µs at 10 Hz
+- Agent overhead target: < 5% CPU, < 20 KB RAM
+- Default demo link: UART over ST-LINK Virtual COM Port
 
-**Twin Latency:**
-- UART (115200 baud): 8ms packet transmission
-- Network (WiFi): 15-50ms
-- Processing: 2ms
-- Total: 25-60ms typical
+**ESP32-P4 (dual-core RISC-V via ESP-IDF FreeRTOS):**
+- Per-core telemetry overhead target: < 3% CPU on the sampled core budget
+- Default demo link: USB CDC or Ethernet
+- Additional requirement: normalize per-core idle/runtime counters
 
-**Memory Footprint:**
-- Agent: 8.5 KB RAM, 18 KB flash
-- Twin: 50 MB RAM (Linux host)
+**Teensy 4.1 (600MHz Cortex-M7 / i.MX RT1062):**
+- Snapshot + encode target: < 100 µs at 10 Hz
+- Default demo link: USB CDC (`Serial`)
+- Optional follow-on transport: hardware UART or Ethernet
+
+**Host-Side Latency Expectations:**
+- UART (115200 baud): ~8 ms per 100-byte packet
+- USB CDC: typically sub-10 ms on a local host
+- Ethernet/UDP on LAN: typically low single-digit milliseconds
+
+**Memory Footprint Goals:**
+- Agent: ~8-20 KB RAM depending on task count and board profile
+- Twin: ~50 MB RAM on a Linux or desktop host
 
 ### Appendix D: Research References
 
@@ -2708,25 +2770,26 @@ With this project:
 ### 5-Minute Setup
 
 **Prerequisites:**
-- STM32 Nucleo board
+- One reference board: NUCLEO-F401RE, ESP32-P4-Function-EV-Board, or Teensy 4.1
 - USB cable
 - PC with Python 3.9+
+- Board-native toolchain (STM32CubeIDE, ESP-IDF, or Teensyduino / PlatformIO)
 
 **Steps:**
 
-1. **Flash Agent:**
+1. **Flash the agent on your target board:**
+- `NUCLEO-F401RE:` flash with ST-LINK and use the on-board Virtual COM Port for telemetry
+- `ESP32-P4:` flash with `idf.py` and prefer USB CDC or Ethernet for the public demo
+- `Teensy 4.1:` upload with Teensy Loader or PlatformIO and start with USB CDC (`Serial`)
+
+2. **Connect the host bridge to the active transport:**
 ```bash
-git clone https://github.com/yourusername/rtostwin
-cd rtostwin/agent
-make flash BOARD=nucleo_f401re
+cd twin
+pip install -r requirements.txt
+python3 main.py --port <serial-port>
 ```
 
-2. **Run Twin:**
-```bash
-cd ../twin
-pip install -r requirements.txt
-python3 main.py --port /dev/ttyACM0
-```
+For Ethernet demos, point the bridge at the board's UDP endpoint instead of a serial port.
 
 3. **Open Dashboard:**
 ```bash
@@ -2737,9 +2800,9 @@ npm start
 ```
 
 4. **See Live Data:**
-- Dashboard shows real-time task states
+- Dashboard shows real-time task states and device metadata
 - Memory graph updates
-- Try clicking "Trigger Test Load" → see CPU spike
+- Compare behavior across STM32F401RE, ESP32-P4, and Teensy 4.1 once all three boards are enabled
 
 **That's it!** You now have a working digital twin.
 

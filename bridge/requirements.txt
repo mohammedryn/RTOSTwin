@@ -1,0 +1,6 @@
+# RTOSTwin Python Bridge — dependencies
+pyserial>=3.5
+scipy>=1.10.0
+prometheus-client>=0.17.0
+opentelemetry-sdk>=1.20.0
+opentelemetry-exporter-otlp-proto-http>=1.20.0

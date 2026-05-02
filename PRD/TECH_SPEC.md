@@ -166,9 +166,12 @@ void encoder_reset(void);
 
 ```c
 uint16_t frame_packet(const uint8_t *payload, uint16_t payload_len,
+                      uint8_t packet_type, uint32_t timestamp_ticks,
                       uint8_t *out_buf, uint16_t out_buf_size);
 uint16_t crc16_ccitt(const uint8_t *data, uint16_t len);
 ```
+
+**Constraints:** `packet_type` must be one of `WF_TYPE_DELTA`, `WF_TYPE_KEYFRAME`, or `WF_TYPE_DEVICE_INFO`. Framer maintains an internal static `uint16_t` sequence counter, increments it per packet, and wraps naturally at `65535 -> 0`.
 
 ### 3.4 Transport
 

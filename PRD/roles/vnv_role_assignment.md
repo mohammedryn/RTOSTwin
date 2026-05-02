@@ -28,7 +28,7 @@
   │   DELTA ENCODER         │  ← YOU OWN THIS
   │   DMA UART TRANSPORT    │  ← YOU OWN THIS
   └──────────┬──────────────┘
-             │ binary stream over UART / WiFi
+             │ binary stream over UART / USB CDC / UDP
              ▼
   ┌─────────────────────────┐
   │   PROMETHEUS ENDPOINT   │  ← YOU OWN THIS (Python bridge side)
@@ -43,15 +43,35 @@
 
 ---
 
+## 🚨 Read This First — Current Project Baseline
+
+- **Canonical implementation root:** repository root `d:\digital_twin\`
+- **Do not split new work across trees:** the top-level `agent/` folder is partial reference code, not the canonical delivery path.
+- **V1 hardware rollout order:** `NUCLEO-F401RE` first, `ESP32-P4-Function-EV-Board` second, `Teensy 4.1` third.
+- **Transport rollout order:** get the STM32 UART baseline working first; then add USB CDC / UDP-style backends needed for `ESP32-P4` and `Teensy 4.1`.
+
+## ✅ Your Exact Work Order (Start Here)
+
+1. **Work in one tree only:** all new implementation goes under the repository root (`d:\digital_twin\`) folders such as `agent/`, `bridge/`, `dashboard/`, `docs/`, `grafana/`, and `prometheus/`.
+2. **Follow RYN's protocol freeze for logic, but do not wait to clean infrastructure:** you can immediately fix syntax/scaffolding issues in your owned Python/YAML files, but packet/framing semantics must follow the frozen `docs/wire_format_spec.md` and `agent/core/wire_format.h`.
+3. **Finish the MCU data path on the baseline board:** `agent/core/framer.*`, `agent/core/encoder.*`, `agent/core/transport.*`, and `agent/hal/stm32/uart_dma.c` must work together first on `NUCLEO-F401RE`.
+4. **Own the bridge assembly path:** `bridge/state_manager.py`, `bridge/device_registry.py`, `bridge/main.py`, `bridge/prometheus_exporter.py`, `bridge/otlp_exporter.py`, and `bridge/mock_device.py` are your path from decoded packets to observability outputs.
+5. **Keep one canonical mock stream for both engineers:** finish `bridge/mock_device.py` with `normal`, `leak`, and `saturated` modes and keep it aligned with the frozen wire format.
+6. **Finish observability only after state flow is correct:** first state reconstruction, then Prometheus/OTLP, then dashboard, then Docker/Prometheus/Grafana wiring.
+7. **After the STM32 baseline is stable, generalize transports for the other demo boards:** `ESP32-P4` and `Teensy 4.1` should reuse the same packet contract and bridge labels.
+
+---
+
 ## 🤝 Integration Contract (Do Not Break)
 
 1. **Single-owner rule (no overlap):**
-      - VNV owns: `agent/core/framer.*`, `agent/core/encoder.*`, `agent/core/transport.*`, `agent/hal/stm32/uart_dma.c`, `bridge/prometheus_exporter.py`, `bridge/otlp_exporter.py`, `bridge/device_registry.py`, `bridge/main.py`, `bridge/mock_device.py`, `dashboard/rtostwin_dashboard.json`
+      - VNV owns: `agent/core/framer.*`, `agent/core/encoder.*`, `agent/core/transport.*`, `agent/hal/stm32/uart_dma.c`, `bridge/state_manager.py`, `bridge/prometheus_exporter.py`, `bridge/otlp_exporter.py`, `bridge/device_registry.py`, `bridge/main.py`, `bridge/mock_device.py`, `dashboard/rtostwin_dashboard.json`
       - RYN owns: `agent/core/snapshot.*`, `agent/core/profiler.*`, `docs/wire_format_spec.md`, `agent/core/wire_format.h`, `bridge/decoder.py`, `bridge/oom_analyzer.py`
-2. **Decoder ownership is fixed:** do not implement a second decoder/parser inside exporter modules; consume `DecodedPacket` from `bridge/decoder.py`.
-3. **Protocol freeze gate:** `docs/wire_format_spec.md` + `agent/core/wire_format.h` must be frozen as `v1` by end of Week 3 and approved by both engineers.
-4. **No breaking protocol change on main:** if packet layout, enum values, field sizes, CRC settings, or delta tags change, bump `WF_PROTOCOL_VERSION` and add backward-compat notes before merge.
-5. **Merge gate (required):** every merge touching protocol/framing/decoder must pass:
+2. **Decoder ownership is fixed:** do not implement a second decoder/parser inside exporter, registry, or state-manager modules; consume `DecodedPacket` from `bridge/decoder.py`.
+3. **State reconstruction ownership is fixed:** `bridge/state_manager.py` belongs to you, but it must reconstruct state from RYN's typed decoder output rather than from raw payload bytes.
+4. **Protocol freeze gate:** `docs/wire_format_spec.md` + `agent/core/wire_format.h` must be frozen as `v1` by end of Week 3 and approved by both engineers.
+5. **No breaking protocol change on main:** if packet layout, enum values, field sizes, CRC settings, or delta tags change, bump `WF_PROTOCOL_VERSION` and add backward-compat notes before merge.
+6. **Merge gate (required):** every merge touching protocol/framing/decoder must pass:
       - 3 golden packet vectors (byte-for-byte exact)
       - Decoder compatibility test for current protocol version
       - End-to-end mock stream test (`mock_device.py` -> `decoder.py`)
@@ -60,7 +80,7 @@
 
 ## 📋 Deliverables — C Firmware Side (agent/)
 
-These files run **on the microcontroller**. Written in C99. Target: STM32F4 (ARM Cortex-M4 @ 168 MHz), later ESP32.
+These files run **on the microcontroller**. Written in C99. V1 rollout is `NUCLEO-F401RE` first, then `ESP32-P4`, then `Teensy 4.1`.
 
 ---
 
@@ -215,17 +235,18 @@ Pushes RTOS metrics as typed OTLP metrics to any OpenTelemetry-compatible backen
 ---
 
 ### Deliverable 6 — Multi-Device Support
-**Files:** `bridge/device_registry.py`, updated `bridge/main.py`
+**Files:** `bridge/state_manager.py`, `bridge/device_registry.py`, updated `bridge/main.py`
 
 **What it does:**  
 Allows one bridge instance to handle telemetry from N devices simultaneously. Each device is identified by a unique `device_id` (configurable, default: serial port name or WiFi IP). Metrics from different devices carry different `device_id` labels and **never cross-contaminate**.
 
 **Design:**
+- `StateManager` reconstructs the full per-device state from RYN's `DecodedPacket`
 - `DeviceRegistry` class: dict of `device_id → DeviceState`
 - Each `DeviceState` holds: latest snapshot, packet counter, drop counter, OOM trend data
 - Bridge main loop: reads from each serial port in async I/O loop (`asyncio`)
 
-**Verification gate:** Two STM32 Nucleo boards connected simultaneously. Grafana shows two separate sets of metrics, each correctly labeled.
+**Verification gate:** Two reference boards connected simultaneously. Grafana shows two separate sets of metrics, each correctly labeled.
 
 ---
 

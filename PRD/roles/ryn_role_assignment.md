@@ -35,7 +35,7 @@
   │    (Partner uses to build        │   This is the contract. Both tracks depend on it.
   │     framer + CRC + encoder)      │
   └───────────────┬──────────────────┘
-                  │ binary packet stream (UART / WiFi)
+                  │ binary packet stream (UART / USB CDC / UDP)
                   ▼
   ┌──────────────────────────────────┐
   │      PACKET DECODER (Python)     │ ← YOU OWN THIS (Python bridge side)
@@ -54,24 +54,42 @@
 
 ---
 
+## 🚨 Read This First — Current Project Baseline
+
+- **Canonical implementation root:** repository root `d:\digital_twin\`
+- **Do not split new work across trees:** the top-level `agent/` folder is partial reference code, not the canonical delivery path.
+- **V1 hardware rollout order:** `NUCLEO-F401RE` first, `ESP32-P4-Function-EV-Board` second, `Teensy 4.1` third.
+- **Performance numbers below:** historical `STM32F4 @ 168 MHz` notes are reference sizing guidance only; accept/reject decisions must be re-measured on the active target board, starting with `NUCLEO-F401RE`.
+
+## ✅ Your Exact Work Order (Start Here)
+
+1. **Create and freeze the protocol contract first:** write `docs/wire_format_spec.md`, then align `agent/core/wire_format.h` with it exactly. Include packet types, CRC settings, delta tags, `DEVICE_INFO`, normalized units, and board metadata.
+2. **Stabilize the snapshot/profiler baseline next:** make `agent/core/snapshot.*`, `agent/core/profiler.*`, and the FreeRTOS hook path work cleanly on the STM32 baseline with no heap allocation, one idle-hook implementation, valid `sequence_num`, and measured timing.
+3. **Finish the typed decoder boundary:** `bridge/decoder.py` must output structured packet data that the rest of the bridge can consume without re-parsing payload bytes.
+4. **Finish the OOM analytics layer:** implement `bridge/oom_analyzer.py` against the tested API and validate it using the shared `bridge/mock_device.py` stream owned by VNV.
+5. **Validate end-to-end on one board before porting:** baseline success is `NUCLEO-F401RE -> decoder -> exporter -> Grafana`. Only after that should you extend protocol/snapshot semantics for `ESP32-P4` and `Teensy 4.1`.
+
+---
+
 ## 🤝 Integration Contract (Do Not Break)
 
 1. **Single-owner rule (no overlap):**
     - RYN owns: `agent/core/snapshot.*`, `agent/core/profiler.*`, `docs/wire_format_spec.md`, `agent/core/wire_format.h`, `bridge/decoder.py`, `bridge/oom_analyzer.py`
-    - VNV owns: `agent/core/framer.*`, `agent/core/encoder.*`, `agent/core/transport.*`, `agent/hal/stm32/uart_dma.c`, `bridge/prometheus_exporter.py`, `bridge/otlp_exporter.py`, `bridge/device_registry.py`, `bridge/main.py`, `bridge/mock_device.py`, `dashboard/rtostwin_dashboard.json`
-2. **Protocol freeze gate:** `docs/wire_format_spec.md` + `agent/core/wire_format.h` must be frozen as `v1` by end of Week 3 and approved by both engineers.
-3. **No breaking protocol change on main:** if packet layout, enum values, field sizes, CRC settings, or delta tags change, bump `WF_PROTOCOL_VERSION` and add backward-compat notes before merge.
-4. **Merge gate (required):** every merge touching protocol/framing/decoder must pass:
+    - VNV owns: `agent/core/framer.*`, `agent/core/encoder.*`, `agent/core/transport.*`, `agent/hal/stm32/uart_dma.c`, `bridge/state_manager.py`, `bridge/prometheus_exporter.py`, `bridge/otlp_exporter.py`, `bridge/device_registry.py`, `bridge/main.py`, `bridge/mock_device.py`, `dashboard/rtostwin_dashboard.json`
+2. **State reconstruction boundary is fixed:** your boundary ends at `DecodedPacket` from `bridge/decoder.py`; `bridge/state_manager.py` belongs to VNV and must consume your typed output rather than re-parsing wire bytes.
+3. **Protocol freeze gate:** `docs/wire_format_spec.md` + `agent/core/wire_format.h` must be frozen as `v1` by end of Week 3 and approved by both engineers.
+4. **No breaking protocol change on main:** if packet layout, enum values, field sizes, CRC settings, or delta tags change, bump `WF_PROTOCOL_VERSION` and add backward-compat notes before merge.
+5. **Merge gate (required):** every merge touching protocol/framing/decoder must pass:
     - 3 golden packet vectors (byte-for-byte exact)
     - Decoder compatibility test for current protocol version
     - End-to-end mock stream test (`mock_device.py` -> `decoder.py`)
-5. **Branch policy:** no direct commits to main for protocol or decoder/framer changes; use PR with both engineers as reviewers.
+6. **Branch policy:** no direct commits to main for protocol or decoder/framer changes; use PR with both engineers as reviewers.
 
 ---
 
 ## 📋 Deliverables — C Firmware Side (agent/)
 
-These files run **on the microcontroller (STM32F4 or ESP32)**. Written in **C99**. No C++, no stdlib heap functions.
+These files run **on the microcontroller**. Written in **C99**. V1 rollout is `NUCLEO-F401RE` first, then `ESP32-P4`, then `Teensy 4.1`. No C++, no stdlib heap functions.
 
 ---
 

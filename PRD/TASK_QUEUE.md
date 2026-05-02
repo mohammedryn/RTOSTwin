@@ -20,7 +20,7 @@
 
 **Context Files:** `TECH_SPEC.md`
 **Output:** `agent/core/wire_format.h`
-**Gate:** File contains all 11 constants. Compiles with zero warnings.
+**Gate:** File contains all 13 constants from TECH_SPEC Section 2.2. Compiles with zero warnings.
 
 ---
 
@@ -34,7 +34,7 @@
 ---
 
 ### Task 3: Implement CRC-16-CCITT (C)
-**Prompt:** "Create `agent/core/framer.h` and `agent/core/framer.c`. Implement `crc16_ccitt()` exactly as specified in TECH_SPEC.md Section 2.3. Also implement `frame_packet()` as specified in TECH_SPEC.md Section 3.3. All buffers are static. No malloc."
+**Prompt:** "Create `agent/core/framer.h` and `agent/core/framer.c` in separate chunks (one file per chunk). Implement `crc16_ccitt()` exactly as specified in TECH_SPEC.md Section 2.3. Also implement `frame_packet()` as specified in TECH_SPEC.md Section 3.3, including `packet_type` and `timestamp_ticks` inputs. All buffers are static. No malloc."
 
 **Context Files:** `TECH_SPEC.md`, `CODING_RULES.md`, `wire_format.h`, `snapshot.h`
 **Output:** `agent/core/framer.h`, `agent/core/framer.c`
@@ -43,7 +43,7 @@
 ---
 
 ### Task 4: CRC + Framer Unit Tests (C)
-**Prompt:** "Create `agent/tests/test_crc.c` and `agent/tests/test_framer.c` using the Unity test framework. Test `crc16_ccitt()` with the standard test vector (b'123456789' → 0x29B1), with empty input, and with a single byte. Test `frame_packet()` with a known payload and verify all header fields and CRC in the output buffer."
+**Prompt:** "Create `agent/tests/test_crc.c` and `agent/tests/test_framer.c` using the Unity test framework in separate chunks (one file per chunk). Test `crc16_ccitt()` with the standard test vector (b'123456789' -> 0x29B1), with empty input, and with a single byte. Test `frame_packet()` with a known payload and verify all header fields and CRC in the output buffer, including TYPE and TIMESTAMP fields."
 
 **Context Files:** `TECH_SPEC.md`, `CODING_RULES.md`, `framer.h`, `framer.c`, `wire_format.h`
 **Output:** `agent/tests/test_crc.c`, `agent/tests/test_framer.c`
@@ -126,7 +126,7 @@
 ---
 
 ### Task 13: Main Telemetry Task
-**Prompt:** "Create `agent/main.c` with a FreeRTOS application. Create a telemetry task at `tskIDLE_PRIORITY + 1`. In the task loop: call `snapshot_capture()`, `encoder_encode()`, `frame_packet()`, `transport_send()` at 10 Hz using `vTaskDelay(pdMS_TO_TICKS(100))`. Wrap `snapshot_capture()` with profiler calls. Report profiler stats every 100 iterations."
+**Prompt:** "Create `agent/main.c` with a FreeRTOS application. Create a telemetry task at `tskIDLE_PRIORITY + 1`. In the task loop: call `snapshot_capture()`, `encoder_encode()`, `frame_packet(payload, payload_len, packet_type, timestamp_ticks, ...)`, `transport_send()` at 10 Hz using `vTaskDelay(pdMS_TO_TICKS(100))`. Wrap `snapshot_capture()` with profiler calls. Report profiler stats every 100 iterations."
 
 **Context Files:** `TECH_SPEC.md`, `CODING_RULES.md`, `snapshot.h`, `encoder.h`, `framer.h`, `transport.h`, `profiler.h`
 **Output:** `agent/main.c`

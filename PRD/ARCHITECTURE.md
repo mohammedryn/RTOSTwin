@@ -2,59 +2,45 @@
 
 ## System Diagram
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        MCU (STM32F4 / ESP32)                        │
-│                                                                     │
-│   ┌─────────────────────┐   ┌──────────────────┐                   │
-│   │   FreeRTOS Kernel   │   │  Application     │                   │
-│   │   (Tasks, Heap,     │   │  Tasks (user's   │                   │
-│   │    Scheduler)       │   │  firmware)       │                   │
-│   └────────┬────────────┘   └──────────────────┘                   │
-│            │ FreeRTOS API calls                                     │
-│            ▼                                                        │
-│   ┌─────────────────────────────────────────┐                      │
-│   │          TELEMETRY AGENT (C99)          │                      │
-│   │                                         │                      │
-│   │  snapshot.c ──► encoder.c ──► framer.c  │                      │
-│   │   (capture)     (delta)      (CRC+hdr)  │                      │
-│   │                      │                   │                      │
-│   │                      ▼                   │                      │
-│   │              transport.c                 │                      │
-│   │           (DMA UART / WiFi)              │                      │
-│   └──────────────┬──────────────────────────┘                      │
-└──────────────────┼──────────────────────────────────────────────────┘
-                   │ Binary packet stream (UART 115200 / WiFi TCP)
-                   ▼
+```text
 ┌──────────────────────────────────────────────────────────────────────┐
-│                  HOST (PC / Raspberry Pi / Edge)                     │
+│            MCU (STM32F401RE / ESP32-P4 / Teensy 4.1)               │
 │                                                                      │
-│   ┌────────────────────────────────────────────────────────────┐    │
-│   │               PYTHON BRIDGE (Python 3.9+)                  │    │
-│   │                                                            │    │
-│   │  decoder.py ──► state_manager.py ──┬──► prometheus.py      │    │
-│   │  (sync, CRC,    (reconstruct       │   (HTTP /metrics)     │    │
-│   │   unframe)       full state from   │                       │    │
-│   │                  deltas)           ├──► otlp_exporter.py   │    │
-│   │                                    │   (OTLP/HTTP push)    │    │
-│   │                                    │                       │    │
-│   │                                    └──► oom_analyzer.py    │    │
-│   │                                        (regression +       │    │
-│   │                                         rolling min)       │    │
-│   └────────────────────────────────────────────────────────────┘    │
-└──────────────────┬───────────────────────────┬───────────────────────┘
-                   │                           │
-                   ▼                           ▼
-         ┌─────────────────┐        ┌──────────────────┐
-         │   Prometheus    │        │  OTel Collector   │
-         │  (scrape :8000) │        │  (receive OTLP)   │
-         └────────┬────────┘        └────────┬─────────┘
-                  │                          │
-                  ▼                          ▼
-         ┌──────────────────────────────────────────┐
-         │              GRAFANA                      │
-         │   (Dashboard JSON template provided)      │
-         └──────────────────────────────────────────┘
+│   FreeRTOS / Board Runtime                                           │
+│        │                                                             │
+│        ▼                                                             │
+│   snapshot.c -> encoder.c -> framer.c -> transport.c                │
+│      |            |             |             |                      │
+│      |            |             |             └─ UART / USB CDC / UDP│
+│      |            |             └─ SYNC + header + CRC              │
+│      |            └─ delta / keyframe encoding                      │
+│      └─ task / heap / CPU capture                                   │
+│                                                                      │
+│   profiler.c measures WCET and timing around hot paths               │
+└───────────────────────────────┬──────────────────────────────────────┘
+                                │
+                                ▼
+                    Binary packet stream to host
+                                │
+                                ▼
+┌──────────────────────────────────────────────────────────────────────┐
+│                    HOST (PC / Raspberry Pi / Edge)                   │
+│                                                                      │
+│   decoder.py -> state_manager.py -> prometheus_exporter.py           │
+│                     │                 ├─ /metrics                    │
+│                     │                 └─ otlp_exporter.py            │
+│                     └─ oom_analyzer.py                               │
+│                                                                      │
+│   mock_device.py provides the canonical simulated packet stream      │
+└───────────────────────────────┬──────────────────────────────────────┘
+                                │
+                   ┌────────────┴────────────┐
+                   ▼                         ▼
+            Prometheus scrape          OTel Collector / OTLP backend
+                   │                         │
+                   └────────────┬────────────┘
+                                ▼
+                              Grafana
 ```
 
 ---
@@ -65,53 +51,60 @@
 
 | Module | Responsibility | Input | Output |
 |---|---|---|---|
-| `snapshot.c` | Read all FreeRTOS state into `full_snapshot_t` | FreeRTOS API | `full_snapshot_t` struct |
-| `profiler.c` | DWT cycle counter measurement | Any function | `profiler_stats_t` |
-| `encoder.c` | Delta-encode current vs previous snapshot | Two `full_snapshot_t` | Encoded byte buffer |
-| `framer.c` | Add SYNC, SEQ, TYPE, TIMESTAMP, LENGTH, CRC to payload | Encoded bytes | Complete packet buffer |
-| `transport.c` | Non-blocking DMA UART transmit | Complete packet | Bytes on wire |
-| `uart_dma.c` | STM32 HAL-specific DMA UART | Packet buffer | Hardware UART TX |
+| `snapshot.c` | Read RTOS state into `full_snapshot_t` | FreeRTOS / board APIs | `full_snapshot_t` |
+| `profiler.c` | Measure cycle counts / timing | Any wrapped function | `profiler_stats_t` |
+| `encoder.c` | Delta-encode current vs previous snapshot | `full_snapshot_t` | Encoded byte buffer |
+| `framer.c` | Add SYNC, TYPE, SEQ, TIMESTAMP, LENGTH, CRC | Encoded bytes | Complete packet buffer |
+| `transport.c` | Non-blocking transport dispatch | Complete packet | Bytes on wire |
+| `agent/hal/stm32/*` | STM32-specific hardware path | Transport requests | UART DMA behavior |
 
 **Data flow (one telemetry cycle):**
-```
+
+```text
 snapshot_capture(&snap)
-  → encoder_encode(&snap, buf, sizeof(buf), is_keyframe)
-    → frame_packet(encoded_buf, encoded_len, packet_buf, sizeof(packet_buf))
-      → transport_send(packet_buf, packet_len)
-        → HAL_UART_Transmit_DMA() [non-blocking, hardware handles bytes]
+  -> encoder_encode(&snap, encoded_buf, size, is_keyframe)
+    -> frame_packet(encoded_buf, encoded_len, packet_type, seq, timestamp, packet_buf, size)
+      -> transport_send(packet_buf, packet_len)
 ```
 
 **Critical constraints:**
-- Telemetry task priority: `tskIDLE_PRIORITY + 1` — NEVER preempts application tasks.
-- Zero `malloc`/`pvPortMalloc` in entire data path.
-- All buffers are `static` at file scope.
-- Critical section (IRQ disabled) only around the raw FreeRTOS API reads — under 50 µs.
+
+- Telemetry task priority stays at `tskIDLE_PRIORITY + 1`.
+- No `malloc` / `pvPortMalloc` in the agent data path.
+- File-scope static buffers only.
+- Critical sections stay around raw RTOS state reads only.
 
 ### Component 2: Python Bridge (Python 3.9+, runs on host)
 
 | Module | Responsibility | Input | Output |
 |---|---|---|---|
-| `decoder.py` | Byte-by-byte stateful packet decoder + CRC check | Raw serial bytes | `DecodedPacket` dataclass |
-| `state_manager.py` | Reconstruct full state from deltas, maintain per-device state | `DecodedPacket` | `DeviceState` |
-| `prometheus_exporter.py` | Serve `/metrics` HTTP endpoint for Prometheus scraping | `DeviceState` | HTTP response |
-| `otlp_exporter.py` | Push metrics via OTLP/HTTP to OTel Collector | `DeviceState` | OTLP/HTTP POST |
-| `oom_analyzer.py` | Sliding window regression + rolling min on heap data | Heap time series | OOM projection seconds |
-| `mock_device.py` | Generate valid binary packet stream without hardware | Config | Byte stream to stdout/TCP |
+| `decoder.py` | Byte-stream decoding + CRC validation | Raw bytes | `DecodedPacket` |
+| `state_manager.py` | Reconstruct full per-device state | `DecodedPacket` | `DeviceState` |
+| `prometheus_exporter.py` | Serve `/metrics` for Prometheus | `DeviceState` | HTTP exposition |
+| `otlp_exporter.py` | Push metrics to OTLP backends | `DeviceState` | OTLP export |
+| `oom_analyzer.py` | Heap trend analysis / OOM projection | Heap samples | Projection seconds |
+| `mock_device.py` | Generate canonical simulated telemetry | Config | Byte stream |
 
 **Data flow:**
-```
-serial.read() → decoder.feed_bytes()
-  → DecodedPacket → state_manager.update()
-    → DeviceState → prometheus_exporter.update_metrics()
-                  → otlp_exporter.export()
-                  → oom_analyzer.add_sample() → projection_seconds
+
+```text
+read transport bytes
+  -> decoder.feed_bytes()
+    -> DecodedPacket
+      -> state_manager.update()
+        -> DeviceState
+          -> prometheus_exporter.update_metrics()
+          -> otlp_exporter.update()
+          -> oom_analyzer.add_sample()
 ```
 
-### Component 3: Grafana Dashboard (JSON, runs in Grafana)
+### Component 3: Grafana Dashboard
 
-- Single JSON file importable via Grafana UI.
-- Data source: Prometheus (preconfigured).
-- 6 panels: Task States, Stack Watermarks, Heap Free, OOM Countdown, CPU Utilization, Packet Loss.
+- Dashboard source file: `dashboard/rtostwin_dashboard.json`
+- Provisioning files:
+  - `grafana/provisioning/dashboards/provider.yml`
+  - `grafana/provisioning/datasources/datasource.yml`
+- Prometheus scrape config: `prometheus/prometheus.yml`
 
 ---
 
@@ -119,36 +112,32 @@ serial.read() → decoder.feed_bytes()
 
 | Transport | MCU Side | Host Side | When |
 |---|---|---|---|
-| UART + DMA | STM32 HAL `HAL_UART_Transmit_DMA` at 115200 8N1 | `pyserial` | v1.0 primary |
-| WiFi TCP | ESP-IDF `esp_transport` or raw socket | Python `asyncio` TCP server | v1.0 secondary |
-| USB CDC | Future | Future | v1.1 |
+| UART + DMA | STM32 HAL `HAL_UART_Transmit_DMA` | `pyserial` | STM32F401RE baseline |
+| USB CDC | Native board USB serial path | Host serial reader | ESP32-P4 / Teensy 4.1 preferred demo path |
+| UDP | Board network stack | Python socket / `asyncio` receiver | Networked multi-board demos |
 
 ---
 
 ## Bandwidth Budget
 
-- UART 115200 baud (8N1) = 11,520 bytes/sec max throughput.
-- Full snapshot (8 tasks) ≈ 350 bytes.
-- At 10 Hz full snapshots = 3,500 bytes/sec = **30% bandwidth** — too much.
-- With delta encoding: 80–200 bytes/sec = **< 2% bandwidth** — viable.
-- **Delta encoding is REQUIRED, not optional.**
+- UART `115200 8N1` gives about `11,520 bytes/sec`.
+- Full snapshots at `10 Hz` are too expensive to send continuously.
+- Delta encoding is required for the steady-state path.
+- Keyframes remain necessary for resync / recovery.
 
 ---
 
 ## Failure Behavior
 
-- DMA busy when new packet ready → **drop packet silently**, increment `tx_drop_count`.
-- UART/WiFi disconnects → agent continues capturing, packets dropped, no crash/hang.
-- Bridge receives no data for 30s → emit `device_offline` alert metric.
-- Corrupted packet (CRC fail) → discard, increment bridge `drop_count`.
-- Sequence gap detected → bridge computes `packet_loss_ratio` metric.
-- **Agent NEVER blocks waiting for transport. Application tasks always have priority.**
+- If transport is busy, the agent drops the packet and increments a drop counter.
+- If UART / USB CDC / UDP disconnects, the agent keeps running; transport must not stall application tasks.
+- CRC failure on host means the packet is discarded and counted.
+- Sequence gaps are surfaced as packet-loss telemetry.
 
 ---
 
 ## Security (v1.0 Limitations)
 
-- v1.0 does NOT implement TLS or authentication on the bridge.
-- Telemetry stream exposes firmware internals (task names, heap sizes, timing).
-- Documentation recommends: TLS for non-local transports, API key for OTLP endpoint, non-descriptive task names in production, network isolation.
-- These are documented warnings, not enforced controls in v1.0.
+- v1.0 does not guarantee secure transport by default.
+- The bridge may expose internal firmware telemetry, so non-local deployments need additional controls.
+- OTLP / networked deployments should add authentication, TLS, and network isolation outside the base v1 path.
