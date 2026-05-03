@@ -5,7 +5,7 @@
 - **Tagline:** RTOS Telemetry Agent & OpenTelemetry Bridge
 - **License:** MIT
 - **Version Target:** v1.0
-- **Platforms:** FreeRTOS 10.5+ on STM32F4 / ESP32
+- **Platforms:** FreeRTOS 10.5+ on `NUCLEO-F401RE`, `ESP32-P4-Function-EV-Board`, and `Teensy 4.1`
 
 ---
 
@@ -36,7 +36,7 @@
 
 | Component | Runs On | Language | Purpose |
 |---|---|---|---|
-| **Telemetry Agent** | MCU (STM32F4 / ESP32) | C99 | Capture RTOS state, encode, transmit |
+| **Telemetry Agent** | MCU (`STM32F401RE` / `ESP32-P4` / `Teensy 4.1`) | C99 | Capture RTOS state, encode, transmit |
 | **OTLP/Prometheus Bridge** | PC / RPi / Edge server | Python 3.9+ | Decode stream, emit OTLP + Prometheus metrics, OOM analysis |
 | **Grafana Dashboard** | Grafana instance | JSON/PromQL | One-click import, visualize all RTOS metrics |
 
@@ -103,9 +103,10 @@
 
 | Item | Required? | Approx Cost |
 |---|---|---|
-| STM32F401RE Nucleo-64 | YES | $15-20 |
-| ESP32-WROOM-32 DevKit V1 | YES | $8-12 |
-| USB-A to Micro-USB cable ×2 | YES | $5 |
+| NUCLEO-F401RE | YES | $15-20 |
+| ESP32-P4-Function-EV-Board | YES | $35-50 |
+| Teensy 4.1 | YES | $27-35 |
+| USB cables / USB-C where needed | YES | $10-15 |
 | USB-UART Adapter (CH340/FTDI) | Optional | $5-8 |
 | Logic Analyzer (8ch Saleae-compatible) | Strongly recommended | $15-25 |
-| **Total minimum** | | **$46-65** |
+| **Total minimum** | | **$107-153** |

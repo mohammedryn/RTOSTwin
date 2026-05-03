@@ -53,7 +53,7 @@ typedef struct {
 
 ### 2.1 Packet Structure — `agent/core/wire_format.h`
 
-All multi-byte fields are **little-endian** (native ARM Cortex-M).
+All multi-byte fields are **little-endian** on the wire, independent of MCU architecture.
 
 | Offset | Field | Size | Value/Range |
 |---|---|---|---|
@@ -181,7 +181,7 @@ int  transport_send(const uint8_t *packet, uint16_t len);  /* 0=ok, -1=busy/drop
 uint32_t transport_get_drop_count(void);
 ```
 
-**Constraints:** Uses `HAL_UART_Transmit_DMA`. If DMA busy (`HAL_UART_STATE_BUSY_TX`), return -1 and increment drop counter. NEVER blocks.
+**Constraints:** The transport layer must expose a non-blocking byte-stream backend. `STM32F401RE` may use `HAL_UART_Transmit_DMA`, while `ESP32-P4` and `Teensy 4.1` may use USB CDC or UDP-capable backends. If the backend is busy, return -1 and increment the drop counter. NEVER blocks.
 
 ### 3.5 Profiler
 

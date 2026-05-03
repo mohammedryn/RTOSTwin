@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Follow these steps to set up the RTOSTwin digital twin.
+Follow these steps to bring up the current `RTOSTwin` stack on the baseline `NUCLEO-F401RE` path first. The same bridge architecture is intended to expand to `ESP32-P4` and `Teensy 4.1` after the host-side bridge is stable.
 
 ## 1. Start the Observability Stack
 Launch Prometheus and Grafana using Docker Compose:
@@ -19,12 +19,12 @@ pip install -r bridge/requirements.txt
 ```
 
 ## 3. Run the Bridge
-Connect your MCU to your PC and run:
+Connect your telemetry source to your PC and run:
 
 ```bash
-python bridge/main.py --serial COM3 --baud 115200
+python bridge/main.py --port COM3 --baud 115200
 ```
-*(Replace `COM3` with your actual serial port)*
+*(Replace `COM3` with your actual serial or USB CDC port.)*
 
 ## 4. View the Dashboard
 1. Open Grafana at [http://localhost:3000](http://localhost:3000).
@@ -32,9 +32,9 @@ python bridge/main.py --serial COM3 --baud 115200
 3. You should see real-time task data and memory trends appearing immediately.
 
 ## Testing without Hardware
-If you don't have an MCU handy, you can run the mock device script:
+If you don't have hardware handy, you can run the mock device script:
 
 ```bash
-python bridge/mock_device.py
+python bridge/mock_device.py --mode normal
 ```
-*(This will simulate a virtual serial port and stream fake telemetry to the bridge)*
+*(This generates valid telemetry bytes for local decoder and bridge testing.)*

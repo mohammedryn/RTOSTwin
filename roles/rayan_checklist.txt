@@ -1,0 +1,508 @@
+RYN Plan
+
+You’re the contract + capture + decode + OOM owner.
+Your job is to make the bytes and semantics correct before VNV builds the rest on top.
+
+Your canonical ownership
+
+Read PRD/roles/ryn_role_assignment.md:64
+Respect the boundary in PRD/roles/ryn_role_assignment.md:74
+Your side ends at DecodedPacket, not state_manager.py: PRD/roles/ryn_role_assignment.md:79
+What to read first, in order
+
+1. Your role doc
+
+PRD/roles/ryn_role_assignment.md:64
+Read:
+exact work order
+ownership split
+protocol freeze rule
+Understand:
+you own snapshot.*, profiler.*, wire_format.h, decoder.py, oom_analyzer.py
+VNV owns framer/encoder/transport/state-manager/exporters/dashboard
+2. Architecture
+
+PRD/ARCHITECTURE.md:48
+Read:
+Component 1 in PRD/ARCHITECTURE.md:50
+telemetry flow in PRD/ARCHITECTURE.md:61
+Python bridge flow in PRD/ARCHITECTURE.md:77
+transport options in PRD/ARCHITECTURE.md:111
+Understand:
+MCU flow is snapshot -> encoder -> framer -> transport
+host flow is decoder -> state_manager -> exporters -> Grafana
+your output must be stable enough for VNV’s state_manager.py
+3. Technical spec
+
+PRD/TECH_SPEC.md:5
+Read carefully:
+snapshot structs: PRD/TECH_SPEC.md:5
+packet format: PRD/TECH_SPEC.md:54
+protocol constants: PRD/TECH_SPEC.md:70
+delta encoding: PRD/TECH_SPEC.md:119
+snapshot API: PRD/TECH_SPEC.md:145
+decoder API: PRD/TECH_SPEC.md:200
+OOM API: PRD/TECH_SPEC.md:212
+hard problems: PRD/TECH_SPEC.md:288
+Understand:
+exact on-wire bytes
+exactly what a snapshot contains
+exactly what the decoder and OOM analyzer must expose
+4. Task queue
+
+PRD/TASK_QUEUE.md:54
+Read:
+decoder task: PRD/TASK_QUEUE.md:54
+decoder tests: PRD/TASK_QUEUE.md:63
+profiler: PRD/TASK_QUEUE.md:83
+snapshot: PRD/TASK_QUEUE.md:92
+hooks: PRD/TASK_QUEUE.md:101
+OOM analyzer: PRD/TASK_QUEUE.md:166
+OOM tests: PRD/TASK_QUEUE.md:175
+bridge main consumer expectations: PRD/TASK_QUEUE.md:184
+Understand:
+what was intended originally
+what your acceptance gates are
+Then read the current code, in this order
+
+A. Snapshot contract
+
+agent/core/snapshot.h:42
+agent/core/snapshot.c:33
+Focus on:
+sequence_num
+timestamp_ticks
+task population
+CPU utilization logic
+What you’ll notice
+
+sequence_num exists in the struct at agent/core/snapshot.h:42
+but snapshot_capture() only sets timestamp at agent/core/snapshot.c:39
+so the snapshot contract is incomplete right now
+B. Idle hook ownership
+
+agent/core/snapshot.c:96
+agent/freertos/hooks.c:39
+Focus on:
+both define vApplicationIdleHook()
+Understand:
+this must be owned in exactly one place
+otherwise CPU-util logic is structurally broken
+C. Framing boundary
+
+agent/core/framer.h:40
+agent/main.c:54
+agent/tests/test_framer.c:24
+Focus on:
+what frame_packet() currently expects
+what main.c currently passes
+what tests currently assume
+Understand:
+this is a contract mismatch that will block end-to-end work
+you don’t own framer code, but you do own the protocol truth, so you must freeze the intended API for VNV
+D. Decoder boundary
+
+bridge/decoder.py:54
+bridge/decoder.py:71
+bridge/state_manager.py:44
+bridge/state_manager.py:57
+Focus on:
+what DecodedPacket actually contains
+what state_manager.py expects it to contain
+Understand:
+decoder currently returns raw payload bytes
+state manager expects typed fields like heap_free_bytes and task_deltas
+this is your biggest host-side contract gap
+E. OOM truth
+
+bridge/tests/test_oom_analyzer.py:27
+bridge/tests/test_oom_analyzer.py:35
+bridge/oom_analyzer.py:18
+bridge/oom_analyzer.py:24
+Focus on:
+test API is the real requirement
+implementation does not match it
+Understand:
+tests expect min_r_squared, rolling_min_threshold, and timestamped samples
+implementation uses r_squared_threshold and add_sample(heap_bytes)
+What each file is doing
+
+PRD/roles/ryn_role_assignment.md
+
+this is your ownership contract
+treat it like your manager’s assignment note
+if a file is not listed under you, don’t casually change it
+PRD/ARCHITECTURE.md
+
+this tells you where your module sits in the pipeline
+it answers: “who consumes my output next?”
+PRD/TECH_SPEC.md
+
+this is the byte-level and API-level truth
+if code and spec disagree, you first document the intended truth, then align code
+PRD/TASK_QUEUE.md
+
+this is the original build order
+useful for knowing intended dependencies and test gates
+agent/core/snapshot.h
+
+defines the embedded truth model
+whatever is missing or ambiguous here will ripple everywhere
+agent/core/snapshot.c
+
+current implementation of that truth model
+you must compare it against the header and spec, not trust it
+agent/freertos/hooks.c
+
+intended RTOS hook ownership file
+likely where idle/stack-overflow hooks should live
+bridge/decoder.py
+
+this is your host-side parser
+this is where raw bytes become structured meaning
+bridge/tests/test_oom_analyzer.py
+
+this is the clearest executable definition of the OOM API
+for OOM work, trust these tests more than the current implementation
+Your full work, start to end
+
+Phase 0 — Understanding and note-taking
+Do this before editing anything.
+
+Make one notebook/doc with 4 sections
+
+Snapshot contract
+Wire protocol
+Decoder output schema
+OOM API
+Write down answers to these exact questions
+
+Who owns sequence number: snapshot or framer?
+Where does CPU-util counting live?
+What exactly is a keyframe payload?
+What exactly is a delta payload?
+What exact Python object should DecodedPacket expose?
+What exact API should OOMAnalyzer expose?
+Deliverable to VNV at end of Phase 0
+
+a short written agreement:
+packet layout
+sequence ownership
+keyframe/delta semantics
+DecodedPacket fields
+this is not code yet; this is alignment
+Phase 1 — Freeze the protocol truth
+This is your first real build milestone.
+
+Your job
+
+create docs/wire_format_spec.md because it is currently missing
+align agent/core/wire_format.h with it
+define the human-readable v1 protocol cleanly
+In docs/wire_format_spec.md, include
+
+sync bytes
+version byte
+packet types
+endianness
+header layout
+CRC definition
+keyframe format
+delta format
+DEVICE_INFO packet definition
+field units:
+stack watermark in words or bytes
+timestamp units
+runtime counter meaning
+board metadata fields for future portability
+Critical decision you must freeze
+
+current spec says framer owns sequence internally: PRD/TECH_SPEC.md:145
+current code/test shape suggests caller passes sequence: agent/core/framer.h:40, agent/tests/test_framer.c:24
+you must choose one and document it
+my recommendation: keep sequence owned by framer for clean transport-layer monotonicity, unless you deliberately want snapshot sequence and packet sequence to differ
+What to give VNV at this checkpoint
+
+docs/wire_format_spec.md
+updated agent/core/wire_format.h
+a short handoff note:
+final frame_packet() signature
+whether framer owns seq
+final packet type values
+3 golden packet examples to match byte-for-byte
+VNV should not continue framer/main integration until you hand this off.
+
+Phase 2 — Stabilize the snapshot baseline
+Now you make the MCU truth trustworthy.
+
+Files to work on
+
+agent/core/snapshot.h
+agent/core/snapshot.c
+agent/core/profiler.h
+agent/core/profiler.c
+likely coordinate with agent/freertos/hooks.c
+Your tasks
+
+make snapshot_capture() fully match the spec
+populate sequence_num
+make timestamp correct
+ensure static-only allocation
+make CPU-util logic coherent
+remove duplicate idle-hook ownership
+Exact problems to fix
+
+sequence_num missing in implementation: agent/core/snapshot.h:42, agent/core/snapshot.c:33
+duplicate idle hook: agent/core/snapshot.c:96, agent/freertos/hooks.c:39
+How to decide idle-hook ownership
+
+put vApplicationIdleHook() in agent/freertos/hooks.c
+keep snapshot.c focused on capture logic
+expose counters via getter/shared module state if needed
+this keeps responsibilities clean
+What to measure
+
+profiler min/max/mean
+worst-case snapshot timing
+whether stack scans are too expensive
+What to give VNV at this checkpoint
+
+exact full_snapshot_t behavior
+whether stack_hwm_words remains words or gets normalized elsewhere
+a sample printed snapshot or captured test data
+a note saying:
+snapshot fields are now stable
+CPU-util semantics are final
+idle-hook ownership is fixed
+baseline STM32 capture logic is ready for encoder/framer consumption
+This is the point where VNV can safely continue encoder/framer/transport integration.
+
+Phase 3 — Define and implement typed decoder output
+This is your most important host-side handoff.
+
+Files to work on
+
+bridge/decoder.py
+optionally a short decoder contract note in docs
+Your goal
+
+decoder must not just say “here is payload bytes”
+decoder must return structured, typed packet meaning
+You should define DecodedPacket shape clearly
+At minimum:
+
+packet_type
+sequence_num
+timestamp_ticks
+for keyframes:
+task_count
+tasks
+heap_free_bytes
+heap_min_ever_bytes
+cpu_utilization_pct
+for deltas:
+task_deltas
+changed system fields
+eventually:
+device metadata for DEVICE_INFO
+Why this matters
+
+bridge/state_manager.py:44 and bridge/state_manager.py:57 already assume typed fields
+VNV cannot build stable state reconstruction until you define this shape
+What to give VNV at this checkpoint
+
+final DecodedPacket schema
+exactly how keyframes are represented
+exactly how delta changes are represented
+a golden decode example:
+one keyframe packet -> expected parsed object
+one delta packet -> expected parsed object
+After this handoff, VNV should implement/fix state_manager.py against your object model, not against raw bytes.
+
+Phase 4 — Fix the OOM analyzer completely
+Do this only after decoder contract is clear.
+
+Files to work on
+
+bridge/oom_analyzer.py
+validate against bridge/tests/test_oom_analyzer.py
+Your real source of truth
+
+tests:
+bridge/tests/test_oom_analyzer.py:27
+bridge/tests/test_oom_analyzer.py:35
+Your target API
+
+__init__(window_size, min_r_squared, rolling_min_threshold, total_heap_bytes)
+add_sample(timestamp_s, heap_free_bytes)
+get_projection_seconds()
+properties:
+regression_slope_bytes_per_second
+rolling_minimum_bytes
+r_squared
+What to give VNV at this checkpoint
+
+stable OOM API
+clear output meaning:
+-1.0 = stable / insufficient data
+positive seconds = regression leak projection
+if you use special rolling-min behavior, document it clearly
+tell VNV exactly what field from DeviceState to feed into OOM and at what cadence
+After this, VNV can wire OOM into main.py and exporters safely.
+
+Phase 5 — Baseline integration support
+At this point, you are mostly supporting VNV with contract clarity.
+
+Your tasks now
+
+help verify:
+decoder parses real packets
+state manager consumes your typed packet format
+OOM analyzer accepts state-manager output
+do not take over VNV-owned modules
+instead, review whether they consume your contracts correctly
+What to give VNV here
+
+bug reports in this format:
+expected contract
+actual behavior
+exact file and line
+fix recommendation
+example:
+bridge/state_manager.py:57 expects task_deltas
+decoder currently produces payload
+state-manager should use final typed delta schema from decoder handoff v1
+Phase 6 — Only then think about ESP32-P4 and Teensy
+Do not start here early.
+
+For ESP32-P4
+
+think about:
+dual-core semantics
+per-core CPU-util later
+transport likely USB CDC or UDP
+but do not redesign the whole protocol until baseline works
+For Teensy 4.1
+
+think about:
+USB CDC-first host path
+runtime counter source
+again, only after baseline is stable
+What to give VNV at this checkpoint
+
+any protocol extension proposal must be:
+additive
+versioned
+backward-compatible when possible
+Your work intervals and exact handoffs
+
+Interval 1 — Protocol freeze
+You finish
+
+reading
+docs/wire_format_spec.md
+agent/core/wire_format.h
+protocol decisions
+You give VNV
+
+final packet layout
+final frame_packet() contract
+golden packet vectors
+keyframe/delta semantics
+Interval 2 — Snapshot freeze
+You finish
+
+snapshot.*
+profiler.*
+idle-hook ownership resolution
+You give VNV
+
+final snapshot field meanings
+stable CPU-util semantics
+proof that snapshot timing is acceptable
+“safe to consume from encoder/framer now”
+Interval 3 — Decoder freeze
+You finish
+
+typed DecodedPacket
+decoder behavior
+decode expectations
+You give VNV
+
+exact DecodedPacket schema
+sample parsed keyframe
+sample parsed delta
+what state_manager.py must consume
+Interval 4 — OOM freeze
+You finish
+
+OOMAnalyzer
+OOM tests
+You give VNV
+
+stable OOM API
+expected return semantics
+how to wire OOM from state updates
+Interval 5 — Integration review
+You do
+
+contract review only
+verify VNV is consuming your outputs correctly
+You give VNV
+
+mismatch reports, not large cross-ownership rewrites
+Your first 3 working days
+
+Day 1
+Read only.
+
+PRD/roles/ryn_role_assignment.md:64
+PRD/ARCHITECTURE.md:48
+PRD/TECH_SPEC.md:5
+PRD/TASK_QUEUE.md:54
+agent/core/snapshot.h:42
+agent/core/snapshot.c:33
+agent/freertos/hooks.c:39
+Output by end of Day 1
+
+a personal notes doc with:
+snapshot field list
+idle-hook decision
+sequence ownership question
+unresolved framer contract question
+Day 2
+Protocol work.
+
+create docs/wire_format_spec.md
+align agent/core/wire_format.h
+inspect agent/core/framer.h:40
+inspect agent/tests/test_framer.c:24
+Output by end of Day 2
+
+protocol freeze draft for VNV review
+Day 3
+Snapshot/profiler work.
+
+fix snapshot.c
+remove duplicate idle hook ownership
+make sequence handling consistent
+validate profiler assumptions
+Output by end of Day 3
+
+snapshot freeze handoff to VNV
+What you should not do
+
+don’t rewrite state_manager.py for VNV
+don’t casually modify framer.*, encoder.*, transport.*
+don’t redesign protocol midstream after handing it off
+don’t start ESP32-P4/Teensy work before baseline contract is stable
+Your personal success criteria
+You are done with your core v1 role when:
+
+docs/wire_format_spec.md exists and is frozen
+agent/core/wire_format.h matches it
+snapshot_capture() matches the struct contract
+only one idle hook exists
+DecodedPacket is typed and stable
+OOMAnalyzer matches tests
+VNV can consume your outputs without reinterpreting raw bytes

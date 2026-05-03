@@ -6,7 +6,7 @@
 
 Domain: Embedded Systems | Industrial IoT | Open Observability
 
-License: MIT (planned) | Target Platform: FreeRTOS on STM32F4 / ESP32
+License: MIT (planned) | Target Platform: FreeRTOS on NUCLEO-F401RE, ESP32-P4, and Teensy 4.1
 
 GitHub: github.com/[username]/rtostwin
 
@@ -318,7 +318,7 @@ Intellectual honesty about scope boundaries is as important as the problem state
 
 ### 4.1 Primary Objectives
 
-1. Build a lightweight C99 telemetry agent for FreeRTOS (v10.5+ on STM32F4 and ESP32) that captures RTOS-internal state with under 2% CPU overhead at 10 Hz, under 10 KB static RAM, using no dynamic allocation in the hot path.
+1. Build a lightweight C99 telemetry agent for FreeRTOS (v10.5+ on NUCLEO-F401RE, ESP32-P4, and Teensy 4.1) that captures RTOS-internal state with under 2% CPU overhead at 10 Hz, under 10 KB static RAM on the baseline board, using no dynamic allocation in the hot path.
 2. Build a Python bridge that decodes the binary telemetry stream and emits typed RTOS metrics as OTLP (OpenTelemetry Protocol) to any compatible backend and as a Prometheus exposition endpoint for Prometheus scraping.
 3. Implement a linear regression-based memory trend analyzer within the bridge that detects sustained heap decrease trends and projects time-to-OOM with configurable alert thresholds.
 4. Provide a reference Grafana dashboard template that works out-of-the-box with Prometheus as the data source, showing all captured RTOS metrics for a single device.
@@ -356,7 +356,7 @@ The architecture has three independently useful components connected by a well-d
 
 | Component | Location | Language | Role |
 |-----------|----------|----------|------|
-| RTOS Telemetry Agent | MCU (STM32F4 / ESP32) | C99 | Captures RTOS state, encodes, transmits |
+| RTOS Telemetry Agent | MCU (NUCLEO-F401RE / ESP32-P4 / Teensy 4.1) | C99 | Captures RTOS state, encodes, transmits |
 | OTLP / Prometheus Bridge | Host PC / Raspberry Pi / Edge server | Python 3.9+ | Decodes stream, emits OTLP + Prometheus metrics, runs trend analysis |
 | Grafana Dashboard Template | Grafana instance (user-operated) | JSON / PromQL | Visualizes all RTOS metrics out-of-the-box |
 
@@ -511,7 +511,7 @@ Goal: Prove the development toolchain works end-to-end on real hardware before w
 - Install arm-none-eabi-gcc toolchain, STM32CubeIDE or VS Code + CMake, ST-Link programmer.
 - Flash FreeRTOS blinky example to STM32F4 Nucleo board. Verify multiple tasks running.
 - Enable DWT cycle counter (`DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk`). Write a benchmark harness that measures empty function call overhead as a baseline.
-- Connect ESP32 DevKit. Flash FreeRTOS via ESP-IDF. Verify WiFi station mode connects to local AP.
+- Connect the ESP32-P4 reference board. Flash the ESP-IDF FreeRTOS target. Verify USB CDC or Ethernet connectivity to the host bridge.
 - Write a Python serial port listener that prints raw bytes from STM32 UART. This verifies the physical channel before any protocol work.
 - **Verification gate:** UART bytes received on PC from STM32. DWT gives reproducible cycle counts. FreeRTOS task switch confirmed on oscilloscope via GPIO toggle in trace hook.
 
@@ -643,7 +643,7 @@ These are binary pass/fail criteria. The project is not complete until all pass.
 - OOM false positives: zero over 24-hour steady-state run — CI integration test.
 - 80+ unit and integration tests passing in GitHub Actions CI on every push.
 - Works end-to-end: STM32F4 Nucleo → UART → Bridge → Prometheus → Grafana dashboard shows live data.
-- Works end-to-end on ESP32 with WiFi transport.
+- Works end-to-end on ESP32-P4 using USB CDC or UDP/Ethernet transport.
 
 ### 9.2 Deliverable Gates
 
@@ -679,7 +679,7 @@ The OTel semantic conventions working group accepts proposals via GitHub issues 
 |-----------|----------|----------|
 | `agent/core/` | `snapshot.h/c`, `encoder.h/c`, `transport.h/c` | C99 |
 | `agent/hal/stm32/` | STM32 HAL wrappers (DMA, UART, DWT) | C99 |
-| `agent/hal/esp32/` | ESP-IDF wrappers (WiFi, UART) | C99 |
+| `agent/hal/esp32/` | ESP-IDF wrappers (USB CDC / UART / UDP support) | C99 |
 | `agent/freertos/` | FreeRTOS trace hook implementations | C99 |
 | `agent/tests/` | Unity unit tests for all agent modules | C99 |
 | `bridge/` | Python bridge: decoder, OTLP exporter, Prometheus endpoint, trend analyzer | Python 3.9+ |
@@ -709,7 +709,7 @@ These items are documented here as intent, not commitments. They will be started
 | Version | Target | Key Addition |
 |---------|--------|-------------|
 | v1.1 | 3 months post v1.0 | Zephyr RTOS support (CTF backend replacement with OTLP bridge) |
-| v1.2 | 6 months post v1.0 | Power consumption metric (energy per telemetry cycle in µJ), nRF52 BLE transport |
+| v1.2 | 6 months post v1.0 | Power consumption metric (energy per telemetry cycle in µJ), additional transports beyond UART/USB CDC/UDP |
 | v1.5 | 12 months post v1.0 | Time-travel replay via persistent flash log and host-side replay engine |
 | v2.0 | 18 months post v1.0 | ML-based anomaly detection (Isolation Forest) with labeled dataset from v1.x deployments |
 | Future | TBD | MISRA-C:2012 compliance for agent. OTel semantic conventions formally adopted. |
@@ -767,7 +767,7 @@ Every platform and dependency has an explicit version target. Without this, cont
 |-----------|------------|-------|
 | FreeRTOS Kernel | v10.5.1 minimum | v11.x tested. `configUSE_TRACE_FACILITY=1` required. `configGENERATE_RUN_TIME_STATS=1` required for CPU %. |
 | STM32F4 HAL | STM32CubeF4 v1.27+ | Uses `HAL_UART_Transmit_DMA`. STM32F401RE Nucleo as reference board. |
-| ESP-IDF | v5.1+ (ESP32 only) | ESP32-WROOM-32 DevKit V1 as reference board. WiFi station mode. |
+| ESP-IDF | v5.1+ (ESP32-P4) | ESP32-P4-Function-EV-Board as reference board. USB CDC or Ethernet demo path. |
 | arm-none-eabi-gcc | v12.0+ (GCC 12) | C99 standard (`-std=c99`). `-O2` optimization for agent. `-Os` for size-critical builds. |
 | Python (Bridge) | 3.9 minimum, 3.11 recommended | Uses `pyserial`, `opentelemetry-sdk`, `opentelemetry-exporter-otlp`, `prometheus_client`, `scipy`, `numpy`. |
 | OpenTelemetry SDK (Python) | opentelemetry-sdk 1.20+ | OTLP/HTTP exporter. Protobuf not required for HTTP/JSON transport. |
@@ -783,7 +783,7 @@ Every platform and dependency has an explicit version target. Without this, cont
 | Item | Purpose | Approx. Cost (USD) | Required? |
 |------|---------|-------------------|-----------|
 | STM32F401RE Nucleo-64 | Primary development board (Cortex-M4 @ 84 MHz). Has ST-Link onboard — no separate programmer needed. | $15-20 | YES |
-| ESP32-WROOM-32 DevKit V1 | WiFi transport testing. FreeRTOS via ESP-IDF. | $8-12 | YES |
+| ESP32-P4-Function-EV-Board | USB CDC / Ethernet transport testing. FreeRTOS via ESP-IDF. | $35-50 | YES |
 | USB-A to Micro-USB cable ×2 | Power + programming + UART for both boards | $5 | YES |
 | USB-UART Adapter (CH340 or FTDI) | Alternative UART connection if Nucleo ST-Link UART is occupied | $5-8 | Optional |
 | Logic Analyzer (Saleae compatible, 8ch) | Measure UART timing, verify DMA transfer timing, debug packet framing | $15-25 | Strongly recommended |

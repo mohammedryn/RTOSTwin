@@ -513,11 +513,11 @@ Create three synthetic test scenarios on the device:
 - `rtos/esp_idf_hooks.c` — ESP-IDF-specific implementations:
   - Task state via `uxTaskGetSystemState()` (same FreeRTOS API, different port).
   - Memory via `esp_get_free_heap_size()`.
-  - WiFi transport (instead of UART).
+  - USB CDC or UDP transport (instead of a UART-only assumption).
 - **HAL Abstraction:** The core `snapshot.c` and `encoder.c` call platform-agnostic functions (`rtos_get_task_count()`, `rtos_get_free_heap()`, etc.) that are implemented per platform.
 
 **Verification Gate:**
-- [ ] Same dashboard works unmodified with STM32/FreeRTOS, nRF52/Zephyr, and ESP32/ESP-IDF devices.
+- [ ] Same dashboard works unmodified with `NUCLEO-F401RE`, `ESP32-P4`, and `Teensy 4.1` devices.
 - [ ] Overhead targets met on all three platforms.
 - [ ] No `#ifdef` spaghetti — clean HAL separation.
 
@@ -554,7 +554,7 @@ Create three synthetic test scenarios on the device:
   3. Inject a stack-heavy workload → dashboard warns of overflow risk.
   4. Trigger an anomaly (interrupt storm) → ML model flags it.
   5. Use time-travel to rewind and analyze the event.
-  6. Show multi-platform (STM32, ESP32) on the same dashboard.
+  6. Show multi-platform (`NUCLEO-F401RE`, `ESP32-P4`, and `Teensy 4.1`) on the same dashboard.
 - **Technical Blog Post:** 2000-word article for Embedded.com or similar.
 - **Conference Paper Draft:** Target IEEE Embedded Systems Letters or ACM TECS.
 - **GitHub Release:** Tagged v1.0.0 with README, LICENSE (MIT), CHANGELOG, and CI badges.
@@ -570,7 +570,7 @@ Create three synthetic test scenarios on the device:
 | R3 | Kalman filter diverges (bad tuning) | Medium | Medium | Start with conservative Q/R values. Add filter reset on large innovations. |
 | R4 | ML anomaly detector has high false positive rate | Medium | Medium | Start with conservative contamination=0.005. Require 3 consecutive anomalous samples before alerting. |
 | R5 | UART DMA conflicts with application DMA | Medium | High | Reserve a dedicated DMA channel for telemetry. Verify no channel conflicts in CubeMX. |
-| R6 | Multi-platform port takes longer than 2 weeks | High | Low | Zephyr port is the priority. ESP-IDF can be deferred to post-v1.0. |
+| R6 | Multi-platform port takes longer than 2 weeks | High | Low | `ESP32-P4` and `Teensy 4.1` follow only after the `NUCLEO-F401RE` baseline is stable. |
 | R7 | Dashboard performance degrades with 8+ hours of data | Medium | Medium | Implement data downsampling for historical view. Only render the visible window. |
 
 ---
@@ -582,8 +582,8 @@ Create three synthetic test scenarios on the device:
 | Item | Purpose | Est. Cost |
 |---|---|---|
 | STM32F4 Discovery / Nucleo | Primary development board (Cortex-M4, 168 MHz, 192 KB RAM) | $25 |
-| ESP32 DevKit V1 | WiFi connectivity test, secondary platform | $10 |
-| nRF52840 DK | BLE testing, Zephyr platform | $45 |
+| ESP32-P4-Function-EV-Board | USB CDC / Ethernet connectivity test, flagship platform | $35-50 |
+| Teensy 4.1 | High-performance USB CDC platform | $27-35 |
 | USB-UART Adapter (CP2102/FTDI) | Initial serial comms | $8 |
 | Saleae-compatible Logic Analyzer | Protocol debugging, timing measurement | $20 |
 
@@ -592,7 +592,7 @@ Create three synthetic test scenarios on the device:
 | Layer | Technology | Justification |
 |---|---|---|
 | Agent (Embedded) | C99, FreeRTOS 10.5+, STM32 HAL | Industry standard. MISRA-C compatible. |
-| Agent (Zephyr port) | C99, Zephyr RTOS 3.x | Growing RTOS ecosystem, Linux Foundation backed. |
+| Agent (board expansion) | C99, FreeRTOS + board-specific BSPs | Validates the shared protocol, platform, and transport layering across the three demo boards. |
 | Twin Core | C++17 | Performance-critical state management and simulation. |
 | Analytics | Python 3.9+, scikit-learn, scipy, numpy | Rapid prototyping of ML models. |
 | Dashboard Backend | Node.js 18+, Express, Socket.IO | Real-time WebSocket support. |
@@ -619,7 +619,7 @@ RTOSTwin/
 │   ├── hal/
 │   │   ├── stm32/                       # STM32 HAL wrappers
 │   │   ├── esp32/                       # ESP32 HAL wrappers
-│   │   └── nrf52/                       # nRF52 HAL wrappers
+│   │   └── imxrt1062/                   # Teensy 4.1 / i.MX RT1062 HAL wrappers
 │   └── tests/                           # Unity unit tests
 │
 ├── twin/                           # Digital twin host software

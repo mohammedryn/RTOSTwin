@@ -78,10 +78,10 @@
 
 ---
 
-## Phase 1 — Agent Core (Requires STM32 Hardware)
+## Phase 1 — Agent Core (Requires Baseline Hardware)
 
 ### Task 8: DWT Profiler
-**Prompt:** "Create `agent/core/profiler.h` and `agent/core/profiler.c` as specified in TECH_SPEC.md Section 3.5. Create `agent/hal/stm32/dwt.h` and `agent/hal/stm32/dwt.c` to enable `DWT->CYCCNT` on STM32. Handle 32-bit wrap-around correctly using unsigned subtraction. `profiler_report()` should printf to UART: `[PROFILER] label: min=X max=Y mean=Z cycles | min=Aµs max=Bµs mean=Cµs @ 168MHz`."
+**Prompt:** "Create `agent/core/profiler.h` and `agent/core/profiler.c` as specified in TECH_SPEC.md Section 3.5. Create the baseline Cortex-M runtime-counter backend at `agent/hal/stm32/dwt.h` and `agent/hal/stm32/dwt.c` to enable `DWT->CYCCNT` on the `NUCLEO-F401RE`. Handle 32-bit wrap-around correctly using unsigned subtraction. `profiler_report()` should printf to UART: `[PROFILER] label: min=X max=Y mean=Z cycles | min=Aµs max=Bµs mean=Cµs @ board clock`."
 
 **Context Files:** `TECH_SPEC.md`, `CODING_RULES.md`, `snapshot.h`
 **Output:** `agent/core/profiler.h`, `agent/core/profiler.c`, `agent/hal/stm32/dwt.h`, `agent/hal/stm32/dwt.c`
@@ -94,7 +94,7 @@
 
 **Context Files:** `TECH_SPEC.md`, `CODING_RULES.md`, `snapshot.h`, `profiler.h`
 **Output:** `agent/core/snapshot.c`
-**Gate:** Compiles. Prints snapshot struct over UART on real STM32. WCET < 150µs verified by profiler.
+**Gate:** Compiles. Prints snapshot struct over the baseline hardware transport on real `NUCLEO-F401RE`. WCET < 150µs verified by profiler.
 
 ---
 
@@ -117,7 +117,7 @@
 ---
 
 ### Task 12: DMA Transport
-**Prompt:** "Implement `agent/core/transport.h`, `agent/core/transport.c`, and `agent/hal/stm32/uart_dma.c`. Use `HAL_UART_Transmit_DMA(&huart2, buf, len)`. Check `HAL_UART_GetState()` before sending — if `HAL_UART_STATE_BUSY_TX`, return -1 and increment `static volatile uint32_t s_tx_drop_count`. Never block. `transport_init()` configures USART2 + DMA."
+**Prompt:** "Implement `agent/core/transport.h`, `agent/core/transport.c`, and the baseline transport backend at `agent/hal/stm32/uart_dma.c`. Use `HAL_UART_Transmit_DMA(&huart2, buf, len)` on `NUCLEO-F401RE`. Check `HAL_UART_GetState()` before sending — if `HAL_UART_STATE_BUSY_TX`, return -1 and increment `static volatile uint32_t s_tx_drop_count`. Never block. `transport_init()` configures the baseline transport and leaves room for later `USB CDC` / `UDP` backends."
 
 **Context Files:** `TECH_SPEC.md`, `CODING_RULES.md`, `wire_format.h`, `framer.h`
 **Output:** `agent/core/transport.h`, `agent/core/transport.c`, `agent/hal/stm32/uart_dma.c`
@@ -186,7 +186,7 @@
 
 **Context Files:** `ARCHITECTURE.md`, `CODING_RULES.md`, `decoder.py`, `state_manager.py`, `prometheus_exporter.py`, `otlp_exporter.py`, `oom_analyzer.py`
 **Output:** `bridge/main.py`, `bridge/config.py`, `bridge/requirements.txt`
-**Gate:** `python bridge/main.py --serial COM3` connects and prints decoded packets.
+**Gate:** `python bridge/main.py --port COM3` connects and prints decoded packets.
 
 ---
 
@@ -220,7 +220,7 @@
 ---
 
 ### Task 23: Example Apps
-**Prompt:** "Create `examples/blinky_twin/main.c` — minimal 1-task FreeRTOS app with telemetry agent integrated. Create `examples/sensor_system/main.c` — multi-task realistic app with sensor_task, processing_task, comms_task + telemetry agent. Both must compile and run on STM32F4 Nucleo."
+**Prompt:** "Create `examples/blinky_twin/main.c` — minimal 1-task FreeRTOS app with telemetry agent integrated. Create `examples/sensor_system/main.c` — multi-task realistic app with sensor_task, processing_task, comms_task + telemetry agent. Both must compile and run first on `NUCLEO-F401RE`, with follow-on ports for `ESP32-P4` and `Teensy 4.1` after the baseline path is stable."
 
 **Context Files:** `TECH_SPEC.md`, `CODING_RULES.md`, all `agent/core/*.h` files
 **Output:** `examples/blinky_twin/`, `examples/sensor_system/`

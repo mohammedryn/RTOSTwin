@@ -360,7 +360,7 @@ Topic: [e.g., "FreeRTOS Task State Modeling"]
 Subtopic: [e.g., "Capturing Task Snapshots Safely"]
 Focus Level: Beginner / Intermediate / Advanced
 Time Available: [e.g., 2 hours]
-Target Platform: STM32F4 / ESP32 / nRF52
+Target Platform: NUCLEO-F401RE / ESP32-P4 / Teensy 4.1
 Preferred Output: Chat / .md / Both
 
 AI must:

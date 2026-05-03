@@ -10,7 +10,7 @@ What it does:
 4. Includes a simulated heap leak to trigger the OOM analyzer.
 
 Usage:
-    python bridge/mock_device.py | python bridge/main.py --serial /dev/stdin
+    python bridge/mock_device.py | python bridge/main.py --port /dev/stdin
     (Or more simply, the script can just send to a local socket)
 """
 

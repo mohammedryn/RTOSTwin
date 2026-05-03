@@ -1168,7 +1168,7 @@ RTOSTwin/
 │   └── hal/
 │       ├── stm32/            # STM32 HAL
 │       ├── esp32/            # ESP32 HAL
-│       └── nrf52/            # nRF52 HAL
+│       └── imxrt1062/        # Teensy 4.1 / i.MX RT1062 platform helpers
 │
 ├── twin/               # Digital twin component (C++/Python)
 │   ├── core/

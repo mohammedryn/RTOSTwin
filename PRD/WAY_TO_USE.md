@@ -36,7 +36,7 @@ Read this section once and never forget it. Every file has exactly one job.
 - What the product is (3 components: Agent, Bridge, Dashboard)
 - Performance targets that MUST be met (e.g., CPU overhead < 2%, RAM < 10KB)
 - What the product deliberately does NOT do (Non-Goals)
-- What hardware you need (STM32, ESP32)
+- What hardware you need (`NUCLEO-F401RE`, `ESP32-P4`, `Teensy 4.1`)
 
 **When to give it to the AI:**
 - When you want the AI to understand the big picture before starting any task
