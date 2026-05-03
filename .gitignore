@@ -12,3 +12,4 @@ wiki/
 .graphifyignore
 AGENTS.md
 CLAUDE.md
+.worktrees/
