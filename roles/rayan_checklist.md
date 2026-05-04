@@ -13,8 +13,12 @@
 - [ ] Inspect `agent/main.c`
 - [ ] Inspect `bridge/decoder.py`
 - [ ] Inspect `bridge/tests/test_oom_analyzer.py`
-- [ ] Create `docs/wire_format_spec.md`
-- [ ] Freeze packet/framer contract before any wider fixes
+- [x] Create `docs/wire_format_spec.md`
+- [x] Freeze packet/framer contract before any wider fixes
+
+## Next thing to do
+
+Phase 2 - stabilize `agent/core/snapshot.*`, remove duplicate idle-hook ownership, and make `sequence_num` population real in the implementation.
 
 ---
 
@@ -189,22 +193,23 @@ Create the protocol truth so nobody else has to guess.
 
 ### Tasks
 
-- [ ] Create `docs/wire_format_spec.md`
-- [ ] Document packet sync bytes
-- [ ] Document version field
-- [ ] Document packet types
-- [ ] Document endianness
-- [ ] Document CRC settings and test vector
-- [ ] Document header field offsets and sizes
-- [ ] Document keyframe payload layout
-- [ ] Document delta payload layout
-- [ ] Document `DEVICE_INFO` packet
+- [x] Create `docs/wire_format_spec.md`
+- [x] Document packet sync bytes
+- [x] Document version field
+- [x] Document packet types
+- [x] Document endianness
+- [x] Document CRC settings and test vector
+- [x] Document header field offsets and sizes
+- [x] Document keyframe payload layout
+- [x] Document delta payload layout
+- [x] Document `DEVICE_INFO` packet
 - [ ] Document units:
   - stack watermark
   - timestamp
   - runtime counters
-- [ ] Decide and document sequence ownership
-- [ ] Align `agent/core/wire_format.h` with the written spec
+- [x] Decide and document sequence ownership: snapshot-owned in v1
+- [x] Align `agent/core/wire_format.h` with the written spec
+- [x] Record 3 golden packet vectors: keyframe, delta, corrupted
 
 ### Key decision to resolve here
 
@@ -417,7 +422,7 @@ You give VNV:
 - final packet layout
 - final `frame_packet()` contract
 - keyframe/delta rules
-- golden packet vectors
+- [x] Record 3 golden packet vectors: keyframe, delta, corrupted
 
 ### Interval 2 - Snapshot Freeze
 
@@ -487,10 +492,10 @@ You give VNV:
 
 ### Day 2 Plan
 
-- [ ] Create `docs/wire_format_spec.md`
-- [ ] Align `agent/core/wire_format.h`
-- [ ] Resolve sequence ownership
-- [ ] Prepare protocol freeze handoff for VNV
+- [x] Create `docs/wire_format_spec.md`
+- [x] Align `agent/core/wire_format.h`
+- [x] Resolve sequence ownership
+- [x] Prepare protocol freeze handoff for VNV
 
 ### Day 3 Plan
 
@@ -505,8 +510,8 @@ You give VNV:
 
 Rayan core work is done when:
 
-- [ ] `docs/wire_format_spec.md` exists
-- [ ] `agent/core/wire_format.h` matches the written spec
+- [x] `docs/wire_format_spec.md` exists
+- [x] `agent/core/wire_format.h` matches the written spec
 - [ ] snapshot semantics are frozen
 - [ ] only one idle-hook implementation remains
 - [ ] `DecodedPacket` is typed and stable
