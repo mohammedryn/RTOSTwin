@@ -122,6 +122,7 @@ d:\digital_twin\
 - The **repo root** is the canonical project root.
 - All active implementation work belongs in root folders such as `agent/`, `bridge/`, `dashboard/`, `docs/`, `grafana/`, and `prometheus/`.
 - `archive/legacy/` is **not** active source; it is preserved only for reference/recovery.
+- Archived material should live here as plain in-repo files and folders, not as nested Git repositories, build-output caches, or generated executables.
 - `artifacts/local-validation/` is **not** source; it stores generated binaries, temporary test harnesses, and scratch outputs.
 - `rtos_twin_learning/` is supporting learning content, not the production runtime path.
 
@@ -145,7 +146,7 @@ d:\digital_twin\
 | `dashboard/rtostwin_dashboard.json` | Grafana dashboard definition | Prometheus scrape config |
 | `docs/reports/*` | Long-form reports and evaluation material | Runtime config |
 | `semantic-conventions/rtos_metrics.md` | OTel semantic conventions proposal | Product quick-start steps |
-| `archive/legacy/*` | Old duplicated or superseded material | New active implementation |
+| `archive/legacy/*` | Old duplicated or superseded material preserved as plain reference content | New active implementation, nested VCS metadata, generated caches, or local build outputs |
 | `artifacts/local-validation/*` | Generated outputs and local test artifacts | Source files meant for active development |
 
 ---

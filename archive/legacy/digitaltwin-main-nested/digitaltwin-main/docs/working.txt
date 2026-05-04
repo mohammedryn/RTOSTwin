@@ -1,0 +1,49 @@
+To use this "vibecoding spec stack" efficiently, you need to treat these files as the absolute source of truth for the AI. Instead of giving the AI vague instructions, you use these files to precisely constrain its behavior and code generation.
+
+Here is the step-by-step workflow for how to use them efficiently in any AI IDE (like Cursor, Windsurf, or when chatting with me):
+
+1. The "Always On" Rules (Global Context)
+Every time you start a new coding session or a new chat, you should always attach or @-mention these two files:
+
+@[AI_WORKFLOW_RULES.md] — Dictates how the AI should talk to you and pace its work.
+@[CODING_RULES.md] — Dictates how the AI should write the code (e.g., no malloc, specific naming conventions, C99 standards).
+Prompt example:
+
+"Read @[AI_WORKFLOW_RULES.md] and @[CODING_RULES.md]. Confirm you understand the 5-step cycle and the forbidden patterns."
+
+2. Picking the Next Task (The Map)
+When you are ready to write code, open @[TASK_QUEUE.md]. Find the next unchecked task. This prevents the AI from jumping around and breaking dependencies.
+
+Prompt example:
+
+"Look at @[TASK_QUEUE.md]. What is the very next task we need to do? Let's start on it following the AI Workflow rules."
+
+3. Injectin g Context for the Specific Task (The Blueprints)
+Depending on what the next task from the Task Queue is, you need to "feed" the AI the exact blueprints so it doesn't hallucinate file names or structs.
+
+If starting a new module: @-mention @[FILE_STRUCTURE.md] so the AI knows exactly where the file belongs.
+If writing data structures or algorithms: @-mention @[TECH_SPEC.md] so the AI uses your exact struct definitions (like task_snapshot_t) instead of inventing its own.
+If integrating systems: @-mention @[ARCHITECTURE.md] so it understands how data flows between the C agent and the Python bridge.
+Prompt example:
+
+"We are working on the C Agent Snapshot module. Read @[TECH_SPEC.md] for the struct definitions and @[FILE_STRUCTURE.md] for where to put the files. Now, execute Chunk 1."
+
+4. The Execution Loop (Enforcing the Rules)
+Once the setup is done, you enforce the 
+
+AI_WORKFLOW_RULES.md
+ relentlessly.
+
+The AI will Announce, Execute, and Explain a small chunk of code.
+It will stop and Ask for permission.
+You read the explanation. If it makes sense, you reply: "Looks good, continue to Chunk 2."
+If it messed up (e.g., used float or forgot a type hint), you reply: "You violated CODING_RULES.md line X. Fix it and explain why."
+Summary of the Optimal Workflow:
+At launch: Load Rules (AI_WORKFLOW, CODING_RULES).
+Consult Map: Pick task from TASK_QUEUE.
+Load Blueprints: Inject TECH_SPEC or FILE_STRUCTURE relevant to that task.
+Execute: Follow the chunk-by-chunk cycle until the task is marked [x] in the TASK_QUEUE.
+This method essentially turns the AI from a loose cannon into a precise typing machine that follows your exact system architecture. Shall we test it out right now by picking the first coding task from your 
+
+TASK_QUEUE.md
+?
