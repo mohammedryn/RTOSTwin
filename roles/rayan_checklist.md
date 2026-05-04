@@ -69,7 +69,7 @@ If a fix touches a non-owned file, first convert it into a contract handoff or r
 
 Important current blockers already known:
 
-- `docs/wire_format_spec.md` does not exist
+- `docs/wire_format_spec.md` now exists and is the frozen v1 protocol source of truth for Phase 1
 - `agent/core/snapshot.h` declares `sequence_num`, but `agent/core/snapshot.c` does not populate it
 - `vApplicationIdleHook()` exists in both:
   - `agent/core/snapshot.c`
@@ -203,10 +203,10 @@ Create the protocol truth so nobody else has to guess.
 - [x] Document keyframe payload layout
 - [x] Document delta payload layout
 - [x] Document `DEVICE_INFO` packet
-- [ ] Document units:
-  - stack watermark
-  - timestamp
-  - runtime counters
+- [x] Document units:
+  - [x] stack watermark
+  - [x] timestamp
+  - [x] runtime counters
 - [x] Decide and document sequence ownership: snapshot-owned in v1
 - [x] Align `agent/core/wire_format.h` with the written spec
 - [x] Record 3 golden packet vectors: keyframe, delta, corrupted

@@ -9,7 +9,7 @@
  * and CRC parameters shared between the C Telemetry Agent and the 
  * Python Bridge.
  * 
- * @note Follows TECH_SPEC.md Section 2.2 exactly.
+ * @note Canonical v1 protocol truth is frozen in docs/wire_format_spec.md.
  */
 
 /* Synchronization bytes */
