@@ -15,10 +15,33 @@
 - [ ] Inspect `bridge/tests/test_oom_analyzer.py`
 - [x] Create `docs/wire_format_spec.md`
 - [x] Freeze packet/framer contract before any wider fixes
+- [x] Clean imported `vnv_final/` folder in isolated branch `chore/vnv-folder-cleanup`
+- [ ] Diff cleaned `vnv_final/docs/wire_format_spec.md` and `vnv_final/agent/core/wire_format.h` against the frozen root-level v1 spec before merge
 
 ## Next thing to do
 
-Phase 2 - stabilize `agent/core/snapshot.*`, remove duplicate idle-hook ownership, and make `sequence_num` population real in the implementation.
+1. Review and merge `chore/vnv-folder-cleanup` after the VNV folder purge is approved.
+2. Reconcile any remaining protocol/doc drift inside `vnv_final/` against the frozen root-level v1 spec.
+3. Resume Phase 2 - stabilize `agent/core/snapshot.*`, remove duplicate idle-hook ownership, and make `sequence_num` population real in the implementation.
+
+---
+
+## VNV Cleanup Status
+
+- [x] Removed committed Python cache artifacts from `vnv_final/bridge/` and `vnv_final/bridge/tests/`
+- [x] Removed stale `vnv_final/log.md`
+- [x] Removed duplicate-style `vnv_final/RTOSTwin_Complete_Report (1).md`
+- [x] Replaced the nested `vnv_final/.gitignore` with subtree-specific runtime/cache rules
+- [x] Renamed manual scripts out of misleading test paths:
+  - `vnv_final/bridge/test_e2e.py` -> `vnv_final/bridge/manual_e2e_demo.py`
+  - `vnv_final/bridge/tests/integration_test.py` -> `vnv_final/bridge/manual_integration_demo.py`
+- [x] Removed the ad hoc manual runner block from `vnv_final/bridge/tests/test_decoder.py`
+- [x] Normalized CLI help text in `vnv_final/bridge/mock_device.py` and `vnv_final/bridge/main.py` so Windows help output works cleanly
+- [x] Verified:
+  - `python -m pytest vnv_final\bridge\tests -q`
+  - `python -m compileall vnv_final\bridge`
+  - `python vnv_final\bridge\mock_device.py --help`
+  - `python vnv_final\bridge\main.py --help`
 
 ---
 
