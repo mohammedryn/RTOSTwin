@@ -90,3 +90,29 @@ Keyframes serialize fields in this order with no padding bytes:
 ### 5.3 Device info payload
 
 `WF_TYPE_DEVICE_INFO` remains a reserved v1 packet type. The constant and framing behavior are part of the frozen v1 contract, but payload generation and payload parsing are out of scope for Phase 1 implementation. A v1 bridge must still validate framing and CRC, surface the packet type, and ignore device-info payload semantics rather than rejecting the transport stream.
+
+## 6. Golden packet vectors
+
+### 6.1 Keyframe vector
+
+- Header: `aa 55 01 02 34 12 04 03 02 01 28 00`
+- Payload: `34 12 04 03 02 01 01 49 44 4c 45 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 64 00 00 00 40 1f 00 00 00 1e 00 00 07`
+- CRC: `96 85` (`0x8596`, little-endian on wire)
+- Full packet: `aa 55 01 02 34 12 04 03 02 01 28 00 34 12 04 03 02 01 01 49 44 4c 45 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 00 64 00 00 00 40 1f 00 00 00 1e 00 00 07 96 85`
+
+### 6.2 Delta vector
+
+- Header: `aa 55 01 01 35 12 68 03 02 01 07 00`
+- Payload: `f5 20 1e 00 00 f7 0a`
+- `f5`: system delta tag for field ID `0x05` (`heap_free_bytes`)
+- `20 1e 00 00`: `heap_free_bytes = 0x00001e20` (`7712`)
+- `f7`: system delta tag for field ID `0x07` (`cpu_utilization_pct`)
+- `0a`: `cpu_utilization_pct = 10`
+- CRC: `36 2d` (`0x2D36`, little-endian on wire)
+- Full packet: `aa 55 01 01 35 12 68 03 02 01 07 00 f5 20 1e 00 00 f7 0a 36 2d`
+
+### 6.3 Corrupted vector
+
+- Start from the delta vector and flip the final CRC byte from `2d` to `d2`.
+- Full packet: `aa 55 01 01 35 12 68 03 02 01 07 00 f5 20 1e 00 00 f7 0a 36 d2`
+- Expected decoder behavior: reject packet, increment drop count, do not emit `DecodedPacket`
