@@ -50,8 +50,10 @@ typedef struct {
 ---
 
 ## 2. Wire Format — Binary Packet Layout
+> Canonical v1 protocol truth now lives only in the root repo files `docs/wire_format_spec.md` and `agent/core/wire_format.h`. This VNV PRD may describe how VNV code consumes that contract, but it must not be treated as an independent packet-spec source.
 
-### 2.1 Packet Structure — `agent/core/wire_format.h`
+
+### 2.1 Packet Structure — root `agent/core/wire_format.h`
 
 All multi-byte fields are **little-endian** on the wire, independent of MCU architecture.
 
@@ -166,12 +168,12 @@ void encoder_reset(void);
 
 ```c
 uint16_t frame_packet(const uint8_t *payload, uint16_t payload_len,
-                      uint8_t packet_type, uint32_t timestamp_ticks,
+                      uint8_t packet_type, uint16_t sequence_num,
+                      uint32_t timestamp_ticks,
                       uint8_t *out_buf, uint16_t out_buf_size);
-uint16_t crc16_ccitt(const uint8_t *data, uint16_t len);
 ```
 
-**Constraints:** `packet_type` must be one of `WF_TYPE_DELTA`, `WF_TYPE_KEYFRAME`, or `WF_TYPE_DEVICE_INFO`. Framer maintains an internal static `uint16_t` sequence counter, increments it per packet, and wraps naturally at `65535 -> 0`.
+**Constraints:** `packet_type` must be one of `WF_TYPE_DELTA`, `WF_TYPE_KEYFRAME`, or `WF_TYPE_DEVICE_INFO`. Sequence ownership is snapshot-owned in v1, so callers pass `sequence_num` into the framer. CRC coverage remains bytes `VERSION..PAYLOAD` exactly as frozen in root `docs/wire_format_spec.md`.
 
 ### 3.4 Transport
 

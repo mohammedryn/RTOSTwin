@@ -132,7 +132,7 @@ d:\digital_twin\
 | Path | What Goes Here | What Does NOT Go Here |
 |---|---|---|
 | `agent/core/snapshot.*` | RTOS state capture structs and logic | Framing, CRC, transport |
-| `agent/core/wire_format.h` | Shared wire constants only | Runtime logic, structs unrelated to protocol constants |
+| `root agent/core/wire_format.h` | Shared wire constants only | Runtime logic, structs unrelated to protocol constants |
 | `agent/core/encoder.*` | Delta/keyframe encoding | UART/HAL code, snapshot capture |
 | `agent/core/framer.*` | Packet assembly and CRC | Transport/HAL code |
 | `agent/core/transport.*` | Transport abstraction logic | STM32 HAL register/HAL details |
@@ -158,7 +158,7 @@ agent/core/snapshot.* -> agent/core/encoder.* -> agent/core/framer.* -> agent/co
                                                                v
                                                           agent/main.c
 
-agent/core/wire_format.h -> bridge/decoder.py -> bridge/state_manager.py
+root agent/core/wire_format.h -> bridge/decoder.py -> bridge/state_manager.py
                                                    -> bridge/prometheus_exporter.py
                                                    -> bridge/otlp_exporter.py
                                                    -> bridge/oom_analyzer.py

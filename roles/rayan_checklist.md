@@ -16,13 +16,26 @@
 - [x] Create `docs/wire_format_spec.md`
 - [x] Freeze packet/framer contract before any wider fixes
 - [x] Clean imported `vnv_final/` folder in isolated branch `chore/vnv-folder-cleanup`
-- [ ] Diff cleaned `vnv_final/docs/wire_format_spec.md` and `vnv_final/agent/core/wire_format.h` against the frozen root-level v1 spec before merge
+- [x] Diff cleaned `vnv_final/docs/wire_format_spec.md` and `vnv_final/agent/core/wire_format.h` against the frozen root-level v1 spec before merge
+- [x] Remove VNV-local duplicate protocol files and align VNV code to the frozen root-level Phase 1 protocol
 
 ## Next thing to do
 
-1. Review and merge `chore/vnv-folder-cleanup` after the VNV folder purge is approved.
-2. Reconcile any remaining protocol/doc drift inside `vnv_final/` against the frozen root-level v1 spec.
-3. Resume Phase 2 - stabilize `agent/core/snapshot.*`, remove duplicate idle-hook ownership, and make `sequence_num` population real in the implementation.
+1. Review and merge `fix/vnv-protocol-alignment` after final protocol-alignment verification.
+2. Resume Phase 2 - stabilize `agent/core/snapshot.*`, remove duplicate idle-hook ownership, and make `sequence_num` population real in the implementation.
+3. Re-run integration review after Phase 2 so VNV and root code stay on the same packet contract.
+
+---
+
+## VNV Protocol Alignment Status
+
+- [x] Deleted redundant `vnv_final/docs/wire_format_spec.md`
+- [x] Deleted redundant `vnv_final/agent/core/wire_format.h`
+- [x] Updated VNV PRD/report text to point at the root canonical protocol files
+- [x] Aligned VNV framer to snapshot-owned sequence numbers and `timestamp_ticks`
+- [x] Aligned VNV encoder to the frozen unpadded keyframe wire layout
+- [x] Aligned VNV bridge decoder/state manager to the frozen v1 packets and golden vectors
+- [x] Re-verified VNV bridge tests after protocol alignment
 
 ---
 

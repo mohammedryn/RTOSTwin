@@ -8,6 +8,8 @@ Domain: Embedded Systems | Industrial IoT | Open Observability
 
 License: MIT (planned) | Target Platform: FreeRTOS on NUCLEO-F401RE, ESP32-P4, and Teensy 4.1
 
+> **Protocol note:** The canonical v1 wire contract is frozen at the repo root in `docs/wire_format_spec.md` and `agent/core/wire_format.h`. This report is descriptive only and must not be treated as an independent packet-spec source.
+
 GitHub: github.com/[username]/rtostwin
 
 ---

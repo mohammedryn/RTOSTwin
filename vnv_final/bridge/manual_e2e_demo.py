@@ -2,13 +2,6 @@
 manual_e2e_demo.py
 ------------------
 Manual end-to-end bridge demo for RTOSTwin.
-
-Runs the decoder, state manager, and OOM analyzer in one Python process,
-feeding them packets generated with the same framing logic as mock_device.py.
-This is a demonstration script, not part of the automated pytest suite.
-
-Run from the vnv_final project root:
-    python bridge/manual_e2e_demo.py
 """
 
 import os
@@ -26,44 +19,44 @@ SYNC_0 = 0xAA
 SYNC_1 = 0x55
 VERSION = 0x01
 TYPE_KEYFRAME = 0x02
-MAX_TASKS = 16
 TASK_NAME_LEN = 16
 
 
 def crc16_ccitt(data: bytes) -> int:
     crc = 0xFFFF
     for byte in data:
-        crc ^= (byte << 8)
+        crc ^= byte << 8
         for _ in range(8):
-            crc = ((crc << 1) ^ 0x1021) if (crc & 0x8000) else (crc << 1)
+            if crc & 0x8000:
+                crc = (crc << 1) ^ 0x1021
+            else:
+                crc = crc << 1
             crc &= 0xFFFF
     return crc
 
 
-def make_packet(seq: int, heap_free: int) -> bytes:
-    timestamp = seq * 100
-    task_count = 4
-    header = struct.pack("<HIB", seq, timestamp, task_count)
+def _task_bytes(name: str, state: int, priority: int, stack: int, runtime: int) -> bytes:
+    name_bytes = bytearray(TASK_NAME_LEN)
+    encoded_name = name.encode("ascii")[: TASK_NAME_LEN - 1]
+    name_bytes[: len(encoded_name)] = encoded_name
+    return bytes(name_bytes) + struct.pack("<BBHI", state, priority, stack, runtime)
 
-    tasks = b""
-    for name, state, prio, stack, runtime in [
+
+def make_packet(seq: int, heap_free: int) -> bytes:
+    timestamp_ticks = seq * 100
+    tasks = [
         ("SensorTask", 2, 3, 512, 10000 + seq * 10),
         ("CommsTask", 2, 2, 384, 8000 + seq * 8),
         ("ProcTask", 1, 2, 256, 15000 + seq * 15),
         ("IDLE", 0, 0, 128, 960000 + seq * 960),
-    ]:
-        name_bytes = name.encode()[:TASK_NAME_LEN].ljust(TASK_NAME_LEN, b"\x00")
-        tasks += name_bytes + struct.pack("<BBHi", state, prio, stack, runtime)
+    ]
+    payload = struct.pack("<HIB", seq, timestamp_ticks, len(tasks))
+    payload += b"".join(_task_bytes(*task) for task in tasks)
+    payload += struct.pack("<IIB", heap_free, heap_free, 20)
 
-    tasks += b"\x00" * ((MAX_TASKS - task_count) * 24)
-
-    heap_min = heap_free
-    memory = struct.pack("<IIB", heap_free, heap_min, 20)
-    payload = header + tasks + memory
-
-    frame_header = struct.pack("<BBHIH", VERSION, TYPE_KEYFRAME, seq, timestamp, len(payload))
-    crc_value = crc16_ccitt(frame_header + payload)
-    return bytes([SYNC_0, SYNC_1]) + frame_header + payload + struct.pack("<H", crc_value)
+    header = struct.pack("<BBHIH", VERSION, TYPE_KEYFRAME, seq, timestamp_ticks, len(payload))
+    crc_value = crc16_ccitt(header + payload)
+    return bytes([SYNC_0, SYNC_1]) + header + payload + struct.pack("<H", crc_value)
 
 
 def main() -> None:
@@ -73,19 +66,14 @@ def main() -> None:
 
     decoder = PacketDecoder()
     manager = StateManager()
-    oom = OOMAnalyzer(
-        window_size=600,
-        min_r_squared=0.7,
-        total_heap_bytes=131_072,
-    )
+    oom = OOMAnalyzer(window_size=600, min_r_squared=0.7, total_heap_bytes=131_072)
 
     heap_free = 131_072
     start_time = time.monotonic()
 
     for seq in range(30):
         heap_free -= 10
-        raw_packet = make_packet(seq, heap_free)
-        packets = decoder.feed_bytes(raw_packet)
+        packets = decoder.feed_bytes(make_packet(seq, heap_free))
 
         for packet in packets:
             state = manager.update(packet)
@@ -112,10 +100,7 @@ def main() -> None:
                 print("  oom       : stable (need more data)")
 
     print("\n" + "=" * 60)
-    print(
-        f"  Done. Decoded {decoder.drop_count} drops, "
-        f"{decoder.sequence_gap_count} gaps."
-    )
+    print(f"  Done. Decoded {decoder.drop_count} drops, {decoder.sequence_gap_count} gaps.")
     print(f"  Final heap: {heap_free:,} bytes")
     print("=" * 60)
 

@@ -34,4 +34,6 @@ uint16_t encoder_encode(const full_snapshot_t *current,
                         uint8_t *out_buf, uint16_t out_buf_size,
                         bool force_keyframe);
 
+bool encoder_last_was_keyframe(void);
+
 #endif /* AGENT_CORE_ENCODER_H */

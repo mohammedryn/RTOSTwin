@@ -86,7 +86,7 @@ Read this section once and never forget it. Every file has exactly one job.
 - Exact C struct definitions (`task_snapshot_t`, `full_snapshot_t`, `memory_snapshot_t`)
 - Every field, its type, its size in bytes, and its purpose
 - The complete binary wire format packet layout (exactly which byte offset holds which field)
-- Every `#define` protocol constant (`WF_SYNC_0 = 0xAA`, `WF_CRC_POLY = 0x1021`, etc.)
+- Every `#define` protocol constant from the root canonical `agent/core/wire_format.h` (`WF_SYNC_0 = 0xAA`, `WF_CRC_POLY = 0x1021`, etc.)
 - The exact CRC-16-CCITT algorithm in both C and Python
 - Every function signature for both the C agent and the Python bridge
 - The delta encoding format (tag byte encoding, field IDs)
@@ -184,7 +184,7 @@ Read this section once and never forget it. Every file has exactly one job.
 
 > *You open TASK_QUEUE.md. Task 1, 2, and 3 are done. Task 4 is next.*
 >
-> "We are on Task 4. The prompt is: 'Create `agent/tests/test_crc.c` and `agent/tests/test_framer.c` using the Unity test framework.' Attach these context files: `TECH_SPEC.md`, `CODING_RULES.md`, `framer.h`, `framer.c`, `wire_format.h`. Follow the AI_WORKFLOW_RULES.md 5-step cycle."
+> "We are on Task 4. The prompt is: 'Create `agent/tests/test_crc.c` and `agent/tests/test_framer.c` using the Unity test framework.' Attach these context files: `TECH_SPEC.md`, `CODING_RULES.md`, `framer.h`, `framer.c`, and the root canonical `../../agent/core/wire_format.h`. Follow the AI_WORKFLOW_RULES.md 5-step cycle."
 
 **What NOT to use it for:**
 - Don't use TASK_QUEUE.md as a replacement for TECH_SPEC.md. The task prompts are short summaries — the AI still needs TECH_SPEC.md to get the exact struct/function details right.
@@ -689,3 +689,4 @@ YOU TYPE: "change [description]" to fix before proceeding.
 ---
 
 *RTOSTwin v1.0 — AI Usage Guide | Last updated: March 2026*
+

@@ -1,48 +1,41 @@
 """
 decoder.py
 -----------
-Packet decoding and validation for the RTOSTwin Python Bridge.
-
-This module is responsible for reading a raw byte stream, synchronizing
-with the packet frame boundaries, and yielding validated payload data.
+Packet decoding and validation for the RTOSTwin Python bridge.
 """
 
-from typing import Optional, List
 from dataclasses import dataclass
 import enum
 import struct
+from typing import List, Optional
 
-# Protocol Constants (Mapped from wire_format.h)
 SYNC_0 = 0xAA
 SYNC_1 = 0x55
 PROTOCOL_VERSION = 0x01
 CRC_POLY = 0x1021
 CRC_INIT = 0xFFFF
-
-# Header is 12 bytes (Sync0, Sync1, Ver, Type, Seq(2), Time(4), Len(2))
-# But state machine handles Sync bytes separately. 
-# Internal header (after sync) is 10 bytes.
-HEADER_INFO_SIZE = 10 
+HEADER_INFO_SIZE = 10
 CRC_SIZE = 2
 
+
 def crc16_ccitt(data: bytes, initial: int = CRC_INIT) -> int:
-    """
-    Calculate the CRC-16-CCITT checksum for a byte array.
-    """
+    """Calculate the CRC-16-CCITT checksum for a byte array."""
     crc = initial
     for byte in data:
         crc ^= byte << 8
         for _ in range(8):
             if crc & 0x8000:
-                crc = ((crc << 1) ^ CRC_POLY)
+                crc = (crc << 1) ^ CRC_POLY
             else:
-                crc = (crc << 1)
-    return crc & 0xFFFF
+                crc = crc << 1
+            crc &= 0xFFFF
+    return crc
 
 
 @dataclass
 class TaskSnapshot:
-    """Python equivalent of 'task_snapshot_t' from the C Agent."""
+    """Python equivalent of task_snapshot_t from the C agent."""
+
     name: str = ""
     state: int = 0
     priority: int = 0
@@ -53,14 +46,14 @@ class TaskSnapshot:
 @dataclass
 class DecodedPacket:
     """Validated packet from the MCU."""
+
     packet_type: int
     sequence_num: int
-    timestamp_ms: int
+    timestamp_ticks: int
     payload: bytes
 
 
 class DecoderState(enum.Enum):
-    """Phases of the packet reception state machine."""
     WAIT_SYNC_0 = 1
     WAIT_SYNC_1 = 2
     READ_HEADER = 3
@@ -70,31 +63,32 @@ class DecoderState(enum.Enum):
 
 class PacketDecoder:
     """State machine for processing RTOSTwin serial packets."""
-    
+
     def __init__(self):
         self._state = DecoderState.WAIT_SYNC_0
         self._buffer = bytearray()
         self._payload_buffer = bytearray()
         self._buffer_for_crc = bytearray()
-        
+
         self._expected_payload_len = 0
         self._pkt_type = 0
         self._seq_num = 0
-        self._timestamp = 0
-        
+        self._timestamp_ticks = 0
+
         self._drop_count = 0
         self._sequence_gap_count = 0
         self._last_seq = -1
 
     @property
-    def drop_count(self) -> int: return self._drop_count
+    def drop_count(self) -> int:
+        return self._drop_count
 
     @property
-    def sequence_gap_count(self) -> int: return self._sequence_gap_count
+    def sequence_gap_count(self) -> int:
+        return self._sequence_gap_count
 
     def feed_byte(self, byte: int) -> Optional[DecodedPacket]:
-        """Processes a single byte and returns a packet if complete."""
-        
+        """Process a single byte and return a packet if one completes."""
         if self._state == DecoderState.WAIT_SYNC_0:
             if byte == SYNC_0:
                 self._state = DecoderState.WAIT_SYNC_1
@@ -103,10 +97,9 @@ class PacketDecoder:
         if self._state == DecoderState.WAIT_SYNC_1:
             if byte == SYNC_1:
                 self._state = DecoderState.READ_HEADER
-                self._buffer = bytearray() # Clear buffer for header contents
+                self._buffer = bytearray()
             elif byte == SYNC_0:
-                # Stay in WAIT_SYNC_1! This handles 0xAA 0xAA 0x55 case.
-                self._state = DecoderState.WAIT_SYNC_1 
+                self._state = DecoderState.WAIT_SYNC_1
             else:
                 self._state = DecoderState.WAIT_SYNC_0
             return None
@@ -114,63 +107,55 @@ class PacketDecoder:
         if self._state == DecoderState.READ_HEADER:
             self._buffer.append(byte)
             if len(self._buffer) == HEADER_INFO_SIZE:
-                # Map bytes to variables (Rule: Little Endian)
-                # 'B' = 1 byte, 'H' = 2 bytes (unsigned), 'I' = 4 bytes (unsigned)
-                # '<' = Little Endian
                 try:
-                    # FIX: Changed last 'I' (4 bytes) to 'H' (2 bytes)
-                    # This matches the 10-byte HEADER_INFO_SIZE
-                    ver, self._pkt_type, self._seq_num, self._timestamp, self._expected_payload_len = \
-                        struct.unpack("<BBHIH", self._buffer)
-                    
-                    if ver != PROTOCOL_VERSION:
-                        self._reset_machine()
-                        return None
-                        
-                    if self._expected_payload_len == 0:
-                        self._state = DecoderState.READ_CRC
-                    else:
-                        self._state = DecoderState.READ_PAYLOAD
-                    self._payload_buffer = bytearray()
-                except Exception:
+                    version, self._pkt_type, self._seq_num, self._timestamp_ticks, self._expected_payload_len = struct.unpack(
+                        "<BBHIH", self._buffer
+                    )
+                except struct.error:
                     self._reset_machine()
+                    return None
+
+                if version != PROTOCOL_VERSION:
+                    self._reset_machine()
+                    return None
+
+                self._payload_buffer = bytearray()
+                if self._expected_payload_len == 0:
+                    self._state = DecoderState.READ_CRC
+                    self._buffer_for_crc = bytearray()
+                else:
+                    self._state = DecoderState.READ_PAYLOAD
             return None
 
         if self._state == DecoderState.READ_PAYLOAD:
             self._payload_buffer.append(byte)
             if len(self._payload_buffer) == self._expected_payload_len:
                 self._state = DecoderState.READ_CRC
-                self._buffer_for_crc = bytearray() # Re-clear for CRC bytes
+                self._buffer_for_crc = bytearray()
             return None
 
         if self._state == DecoderState.READ_CRC:
             self._buffer_for_crc.append(byte)
             if len(self._buffer_for_crc) == CRC_SIZE:
-                # 1. Validate CRC
                 received_crc = struct.unpack("<H", self._buffer_for_crc)[0]
-                
-                # CRC covers VERSION (1st byte of _buffer) through end of PAYLOAD
-                data_to_verify = self._buffer + self._payload_buffer
-                calculated_crc = crc16_ccitt(data_to_verify)
-                
+                calculated_crc = crc16_ccitt(self._buffer + self._payload_buffer)
+
                 if received_crc != calculated_crc:
                     self._drop_count += 1
                     self._reset_machine()
                     return None
-                
-                # 2. Check Sequence Gap
+
                 if self._last_seq != -1:
                     expected_next = (self._last_seq + 1) & 0xFFFF
                     if self._seq_num != expected_next:
                         self._sequence_gap_count += 1
                 self._last_seq = self._seq_num
 
-                # 3. Build Result
                 packet = DecodedPacket(
                     packet_type=self._pkt_type,
                     sequence_num=self._seq_num,
-                    timestamp_ms=self._timestamp,
-                    payload=bytes(self._payload_buffer)
+                    timestamp_ticks=self._timestamp_ticks,
+                    payload=bytes(self._payload_buffer),
                 )
                 self._reset_machine()
                 return packet
@@ -179,18 +164,15 @@ class PacketDecoder:
         return None
 
     def feed_bytes(self, data: bytes) -> List[DecodedPacket]:
-        """Batch process a list of bytes."""
-        packets = []
-        for b in data:
-            p = self.feed_byte(b)
-            if p:
-                packets.append(p)
+        """Batch process a byte string."""
+        packets: List[DecodedPacket] = []
+        for byte in data:
+            packet = self.feed_byte(byte)
+            if packet is not None:
+                packets.append(packet)
         return packets
 
-        
-
     def _reset_machine(self) -> None:
-        """Go back to start and clear temporary buffers."""
         self._state = DecoderState.WAIT_SYNC_0
         self._buffer = bytearray()
         self._payload_buffer = bytearray()
