@@ -3,7 +3,6 @@ wiki/.obsidian/core-plugins.json
 .claude
 .codex
 graphify-out/
-rtos_twin_learning/
 wiki/
 .graphify_ast.json
 .graphify_detect.json
@@ -13,3 +12,4 @@ wiki/
 AGENTS.md
 CLAUDE.md
 .worktrees/
+rtos_twin_learning/
