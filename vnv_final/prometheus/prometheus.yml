@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 5s # Fast scrape for real-time digital twin feel
+
+scrape_configs:
+  - job_name: "rtostwin-bridge"
+    static_configs:
+      - targets: ["host.docker.internal:8000"]

@@ -1,0 +1,18 @@
+# RTOSTwin Python Bridge — pinned dependencies
+# Install with: pip install -r requirements.txt
+
+# Serial port communication (real MCU transport)
+pyserial>=3.5
+
+# Scientific computing (OOM analyzer linear regression)
+scipy>=1.10.0
+numpy>=1.24.0
+
+# Prometheus metrics exposition endpoint
+prometheus-client>=0.17.0
+
+# OpenTelemetry SDK (metrics pipeline)
+opentelemetry-sdk>=1.20.0
+
+# OTLP/HTTP exporter (push to Grafana Cloud / OTel Collector)
+opentelemetry-exporter-otlp-proto-http>=1.20.0

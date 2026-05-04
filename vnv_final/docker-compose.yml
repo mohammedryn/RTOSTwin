@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: rtostwin-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    # host.docker.internal lets the container reach the bridge running on your PC
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: rtostwin-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Anonymous access — no login needed for local dev
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      # Datasource and dashboard provider configuration
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
