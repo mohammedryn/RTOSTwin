@@ -31,6 +31,7 @@ OTLP_ENDPOINT: str = os.getenv(
     "http://localhost:4318/v1/metrics"
 )
 OTLP_EXPORT_INTERVAL_MS: int = 30_000     # Push every 30 seconds
+OTLP_ENABLED: bool = os.getenv("RTOSTWIN_ENABLE_OTLP", "0") == "1"
 
 # ---------------------------------------------------------------------------
 # OOM Analyzer Settings

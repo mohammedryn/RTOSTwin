@@ -3,30 +3,18 @@ main.py
 -------
 Entry point for the RTOSTwin Python Bridge.
 
-Wires together the decoder, state manager, Prometheus exporter, OTLP
-exporter, and OOM analyzer into a single read loop. Reads from a serial
-port (real MCU) or stdin (piped from mock_device.py for testing).
-
-Usage - with real hardware:
-    python bridge/main.py --port COM3
-
-Usage - with mock device (no hardware):
-    python bridge/mock_device.py --mode leak | python bridge/main.py --port stdin
-
-Usage - full stack (Docker):
-    docker-compose up        # Starts Prometheus + Grafana
-    python bridge/main.py    # Bridge feeds Prometheus
-
-Ownership: VNV
+Wires together the decoder, state manager, Prometheus exporter, optional OTLP
+exporter, and OOM analyzer into a single read loop. Reads from a serial port
+(real MCU) or stdin (piped from mock_device.py for testing).
 """
 
 import argparse
 import logging
 import sys
 import time
-from typing import Optional
+from typing import Iterable, Optional
 
-import serial  # pip install pyserial
+import serial
 
 from config import (
     DEFAULT_BAUD_RATE,
@@ -34,10 +22,11 @@ from config import (
     OOM_MIN_R_SQUARED,
     OOM_ROLLING_MIN_THRESHOLD,
     OOM_WINDOW_SIZE,
+    OTLP_ENABLED,
     PROMETHEUS_PORT,
     TOTAL_HEAP_BYTES,
 )
-from decoder import PacketDecoder
+from decoder import DecodedPacket, PacketDecoder
 from device_registry import DeviceRegistry
 from oom_analyzer import OOMAnalyzer
 from otlp_exporter import OTLPExporter
@@ -52,12 +41,7 @@ logger = logging.getLogger("bridge.main")
 
 
 def _open_transport(port: str, baud: int):
-    """
-    Open the byte source. Returns a file-like object with a .read(n) method.
-
-    'stdin' is a special keyword that reads from standard input and is used when
-    piping mock_device.py output directly into this bridge for testing.
-    """
+    """Open the byte source and return an object with a .read(n) method."""
     if port.lower() == "stdin":
         logger.info("[main] Reading from stdin (mock device mode)")
         return sys.stdin.buffer
@@ -71,17 +55,55 @@ def _open_transport(port: str, baud: int):
         sys.exit(1)
 
 
+def handle_packets(
+    device_id: str,
+    packets: Iterable[DecodedPacket],
+    decoder: PacketDecoder,
+    registry: DeviceRegistry,
+    prom: PrometheusExporter,
+    otlp: Optional[OTLPExporter],
+    oom: OOMAnalyzer,
+    otlp_enabled: bool,
+) -> int:
+    """Apply decoded packets to device state and fan out exporter updates."""
+    processed = 0
+
+    for packet in packets:
+        processed += 1
+        manager = registry.get_or_create(device_id)
+
+        if decoder.sequence_gap_count > manager.current_state.drop_count:
+            manager.record_drop()
+
+        state = manager.update(packet)
+
+        now_s = time.monotonic()
+        oom.add_sample(timestamp_s=now_s, heap_free_bytes=state.heap_free_bytes)
+        oom_seconds = oom.get_projection_seconds()
+
+        if oom_seconds > 0:
+            logger.warning(
+                "[oom] LEAK DETECTED on %s - OOM in %.1f seconds",
+                device_id,
+                oom_seconds,
+            )
+
+        prom.update_metrics(device_id, state, oom_seconds)
+        if otlp_enabled and otlp is not None:
+            otlp.export_metrics(device_id, state, oom_seconds)
+
+    return processed
+
+
 def run_bridge(port: str, baud: int, device_id: Optional[str] = None) -> None:
-    """
-    Main loop: read bytes -> decode -> update state -> push metrics.
-    """
+    """Main loop: read bytes, decode packets, update state, and push metrics."""
     dev_id = device_id or port
 
     transport = _open_transport(port, baud)
     decoder = PacketDecoder()
     registry = DeviceRegistry()
     prom = PrometheusExporter(port=PROMETHEUS_PORT)
-    otlp = OTLPExporter()
+    otlp = OTLPExporter() if OTLP_ENABLED else None
     oom = OOMAnalyzer(
         window_size=OOM_WINDOW_SIZE,
         min_r_squared=OOM_MIN_R_SQUARED,
@@ -91,6 +113,7 @@ def run_bridge(port: str, baud: int, device_id: Optional[str] = None) -> None:
 
     prom.start()
     logger.info("[main] Prometheus metrics at http://localhost:%d/metrics", PROMETHEUS_PORT)
+    logger.info("[main] OTLP export %s", "enabled" if OTLP_ENABLED else "disabled")
     logger.info("[main] Bridge running. Press Ctrl-C to stop.")
 
     total_packets = 0
@@ -105,29 +128,16 @@ def run_bridge(port: str, baud: int, device_id: Optional[str] = None) -> None:
                 continue
 
             packets = decoder.feed_bytes(raw)
-
-            for packet in packets:
-                total_packets += 1
-                manager = registry.get_or_create(dev_id)
-
-                if decoder.sequence_gap_count > manager.current_state.drop_count:
-                    manager.record_drop()
-
-                state = manager.update(packet)
-
-                now_s = time.monotonic()
-                oom.add_sample(timestamp_s=now_s, heap_free_bytes=state.heap_free_bytes)
-                oom_seconds = oom.get_projection_seconds()
-
-                if oom_seconds > 0:
-                    logger.warning(
-                        "[oom] LEAK DETECTED on %s - OOM in %.1f seconds",
-                        dev_id,
-                        oom_seconds,
-                    )
-
-                prom.update_metrics(dev_id, state, oom_seconds)
-                # otlp.export_metrics(dev_id, state, oom_seconds)
+            total_packets += handle_packets(
+                device_id=dev_id,
+                packets=packets,
+                decoder=decoder,
+                registry=registry,
+                prom=prom,
+                otlp=otlp,
+                oom=oom,
+                otlp_enabled=OTLP_ENABLED,
+            )
 
             now = time.monotonic()
             if now - last_log_time >= log_interval_s:
