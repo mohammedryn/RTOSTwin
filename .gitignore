@@ -13,3 +13,7 @@ AGENTS.md
 CLAUDE.md
 .worktrees/
 rtos_twin_learning/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+artifacts/

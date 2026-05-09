@@ -56,8 +56,9 @@
 
 ## 🚨 Read This First — Current Project Baseline
 
-- **Canonical implementation root:** repository root `d:\digital_twin\`
-- **Do not split new work across trees:** the top-level `agent/` folder is partial reference code, not the canonical delivery path.
+- **Canonical protocol and snapshot root:** repository root `d:\digital_twin\`
+- **Current VNV handoff execution lane:** `d:\digital_twin\vnv_final\`
+- **Do not split new work across trees unintentionally:** root-level `agent/` and `bridge/` remain the RYN-owned protocol/snapshot baseline, while VNV's delivery work is currently staged in `vnv_final/`.
 - **V1 hardware rollout order:** `NUCLEO-F401RE` first, `ESP32-P4-Function-EV-Board` second, `Teensy 4.1` third.
 - **Performance numbers below:** historical `STM32F4 @ 168 MHz` notes are reference sizing guidance only; accept/reject decisions must be re-measured on the active target board, starting with `NUCLEO-F401RE`.
 

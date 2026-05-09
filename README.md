@@ -4,6 +4,13 @@
 
 ![RTOSTwin Architecture](dashboard/architecture_diagram.png)
 
+## Current Handoff Status
+
+- **VNV implementation lane:** work only in `vnv_final/` for the current handoff and demo-readiness push.
+- **Protocol source of truth:** `docs/wire_format_spec.md` and `agent/core/wire_format.h` remain the canonical v1 packet contract.
+- **Do not start VNV work in the root `agent/` or `bridge/` trees:** those root-level modules still contain RYN-owned baseline/protocol work and older reference code that is not the clean VNV delivery path.
+- **Handoff checklist:** use `roles/vnv_checklist.md` as the entry point before changing anything inside `vnv_final/`.
+
 ## Features
 
 - **🚀 Low-overhead agent:** Optimized C agent with delta encoding and board-specific transport backends.

@@ -45,14 +45,15 @@
 
 ## 🚨 Read This First — Current Project Baseline
 
-- **Canonical implementation root:** repository root `d:\digital_twin\`
-- **Do not split new work across trees:** the top-level `agent/` folder is partial reference code, not the canonical delivery path.
+- **Current handoff execution lane:** work only in `d:\digital_twin\vnv_final\` for this VNV pass.
+- **Root-level protocol truth still applies:** `docs/wire_format_spec.md` and `agent/core/wire_format.h` at the repository root remain the canonical v1 packet contract.
+- **Do not split new work across trees:** the top-level `agent/` and `bridge/` folders remain RYN-owned baseline/reference paths for protocol and snapshot work, not the clean VNV delivery lane.
 - **V1 hardware rollout order:** `NUCLEO-F401RE` first, `ESP32-P4-Function-EV-Board` second, `Teensy 4.1` third.
 - **Transport rollout order:** get the STM32 UART baseline working first; then add USB CDC / UDP-style backends needed for `ESP32-P4` and `Teensy 4.1`.
 
 ## ✅ Your Exact Work Order (Start Here)
 
-1. **Work in one tree only:** all new implementation goes under the repository root (`d:\digital_twin\`) folders such as `agent/`, `bridge/`, `dashboard/`, `docs/`, `grafana/`, and `prometheus/`.
+1. **Work in one tree only:** all new VNV implementation for this handoff goes under `d:\digital_twin\vnv_final\`. Unless a file is explicitly called out as a root-level protocol source of truth, interpret the delivery paths in this document relative to `vnv_final/`.
 2. **Follow RYN's protocol freeze for logic, but do not wait to clean infrastructure:** you can immediately fix syntax/scaffolding issues in your owned Python/YAML files, but packet/framing semantics must follow the frozen `docs/wire_format_spec.md` and `agent/core/wire_format.h`.
 3. **Finish the MCU data path on the baseline board:** `agent/core/framer.*`, `agent/core/encoder.*`, `agent/core/transport.*`, and `agent/hal/stm32/uart_dma.c` must work together first on `NUCLEO-F401RE`.
 4. **Own the bridge assembly path:** `bridge/state_manager.py`, `bridge/device_registry.py`, `bridge/main.py`, `bridge/prometheus_exporter.py`, `bridge/otlp_exporter.py`, and `bridge/mock_device.py` are your path from decoded packets to observability outputs.
