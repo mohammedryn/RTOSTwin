@@ -4,6 +4,17 @@
 
 ![RTOSTwin Architecture](dashboard/architecture_diagram.png)
 
+## Hardware Validation Status
+
+The baseline hardware-to-dashboard path is validated end to end on a real
+`NUCLEO-F401RE` as of `2026-05-10`. The validated STM32 firmware project is
+`RTOSTwinF401RE_clean`, and the recorded proof path is `ST-LINK VCP -> Python
+bridge -> Prometheus -> Grafana`.
+
+See
+[`docs/reports/hardware_validation_2026-05-10.md`](docs/reports/hardware_validation_2026-05-10.md)
+for the concrete build, flash, serial, and metrics evidence.
+
 ## Features
 
 - **🚀 Low-overhead agent:** Optimized C agent with delta encoding and board-specific transport backends.

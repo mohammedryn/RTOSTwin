@@ -77,7 +77,7 @@ def handle_packets(
 
         state = manager.update(packet)
 
-        now_s = time.monotonic()
+        now_s = time.monotonic_ns() / 1_000_000_000.0
         oom.add_sample(timestamp_s=now_s, heap_free_bytes=state.heap_free_bytes)
         oom_seconds = oom.get_projection_seconds()
 

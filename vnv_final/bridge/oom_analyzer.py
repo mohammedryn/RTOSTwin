@@ -89,6 +89,14 @@ class OOMAnalyzer:
         y: np.ndarray = data[:, 1]
         x_norm = x - x[0]   # Normalise to avoid large-number errors
 
+        # Fast packet bursts can still produce identical timestamps on some
+        # hosts. In that case regression is undefined, so treat the window as
+        # not yet usable for slope-based analysis instead of crashing.
+        if np.amax(x_norm) == np.amin(x_norm):
+            self._slope = 0.0
+            self._r_squared = 0.0
+            return -1.0
+
         # --- Detector 1: Linear Regression ---
         slope, _intercept, r_value, _p, _stderr = linregress(x_norm, y)
         self._slope = float(slope)

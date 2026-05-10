@@ -1,7 +1,9 @@
 # VNV Repo Completion Status
 
-This document records what the `vnv_final/` lane can be verified to do from the
-repository alone, and what still requires external STM32 hardware proof.
+This document records both:
+
+- what the `vnv_final/` lane can be verified to do from the repository alone
+- what has been verified externally on real STM32 hardware
 
 ## Verified locally from the repo
 
@@ -28,15 +30,32 @@ The bridge test suite now covers:
 - OTLP fan-out is wired through the bridge path and is only enabled when `RTOSTWIN_ENABLE_OTLP=1`.
 - Docker Compose provisions Prometheus and Grafana for local development in `vnv_final/`.
 
-## Still not claimable without external evidence
+## Verified externally on real hardware
 
-These items require real board access and should not be claimed as complete from repo-only verification:
+As of `2026-05-10`, the full hardware-backed path has been demonstrated on a
+real `NUCLEO-F401RE`.
 
-- flashing firmware to `NUCLEO-F401RE`
-- proving UART/DMA packets are visible on the wire from the actual board
-- confirming the real serial stream reaches the bridge
-- capturing a Grafana screenshot with live hardware-backed data
-- recording the exact STM32 build/flash command and serial-port setup used for the successful run
+Validated hardware evidence includes:
+
+- STM32 firmware project `RTOSTwinF401RE_clean` builds successfully with the telemetry agent linked in
+- firmware flashes successfully through ST-LINK with verification completed
+- the board streams live packets over `STMicroelectronics STLink Virtual COM Port (COM11)`
+- `python bridge/main.py --port COM11 --baud 115200 --device-id nucleo-f401re` decodes packets continuously with `drops=0` and `seq_gaps=0`
+- `http://localhost:8000/metrics` exposes live RTOS metrics for `device_id="nucleo-f401re"`
+- Prometheus queries return live values for CPU, heap, per-task CPU, stack watermark, packet loss, and OOM projection
+- the provisioned Grafana dashboard renders live hardware-backed panels successfully
+
+See [`reports/hardware_validation_2026-05-10.md`](reports/hardware_validation_2026-05-10.md)
+for the detailed record.
+
+## What still requires caution
+
+These items should still be treated carefully even though the baseline
+end-to-end validation is complete:
+
+- the validated run is currently tied to the clean STM32 baseline project `RTOSTwinF401RE_clean`
+- other historical STM32 project folders are not part of the validated path
+- timing, overhead, and long-duration soak results should only be claimed when re-measured on the exact firmware/hardware revision under test
 
 ## Honest completion boundary
 
@@ -44,10 +63,9 @@ From this repository we can now claim:
 
 - the VNV-owned `vnv_final/` software lane is locally reproducible and test-backed
 - the mock-to-metrics observability path is in place
-- the remaining gap is the final external hardware proof step
+- the baseline end-to-end `NUCLEO-F401RE -> UART -> Bridge -> Prometheus -> Grafana` path has been validated on real hardware as of `2026-05-10`
 
 We cannot honestly claim:
 
-- end-to-end `NUCLEO-F401RE -> UART -> Bridge -> Prometheus -> Grafana` has been physically demonstrated
-
-until that evidence is produced.
+- that every STM32 project variant in the repo is hardware-validated
+- that performance, overhead, or reliability results generalize beyond the validated baseline without fresh measurement

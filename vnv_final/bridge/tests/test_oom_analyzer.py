@@ -122,3 +122,14 @@ def test_insufficient_data_returns_stable() -> None:
     projection = analyzer.get_projection_seconds()
 
     assert projection == -1.0, f"Expected -1.0 (insufficient data), got {projection}"
+
+
+def test_identical_timestamps_do_not_crash() -> None:
+    analyzer = OOMAnalyzer(total_heap_bytes=TOTAL_HEAP)
+
+    for _ in range(40):
+        analyzer.add_sample(timestamp_s=1234.0, heap_free_bytes=65_536)
+
+    projection = analyzer.get_projection_seconds()
+
+    assert projection == -1.0, f"Expected stable result for identical timestamps, got {projection}"

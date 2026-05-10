@@ -1,8 +1,9 @@
 # Quick Start Guide
 
 Follow these steps from the `vnv_final/` directory to bring up the local
-observability stack first, then swap in the real `NUCLEO-F401RE` serial stream
-when hardware is available.
+observability stack. The real `NUCLEO-F401RE` path has now been validated end
+to end; see [`reports/hardware_validation_2026-05-10.md`](reports/hardware_validation_2026-05-10.md)
+for the recorded board, firmware, and metric evidence.
 
 ## 1. Start in the correct working tree
 
@@ -64,13 +65,20 @@ Then open Grafana and load the provisioned dashboard to watch live mock data.
 
 ## 5. Real hardware path (`NUCLEO-F401RE`)
 
-Connect your telemetry source to your PC and run:
+Validated hardware baseline:
+
+- STM32 project: `RTOSTwinF401RE_clean`
+- Host serial port observed during validation: `COM11`
+- Windows device name: `STMicroelectronics STLink Virtual COM Port`
+
+Start the bridge with the validated command:
 
 ```bash
-python bridge/main.py --port COM3 --baud 115200 --device-id nucleo-f401re
+python bridge/main.py --port COM11 --baud 115200 --device-id nucleo-f401re
 ```
 
-Replace `COM3` with the actual serial or USB CDC port exposed by your board.
+If your machine exposes a different COM port, replace `COM11` with the actual
+virtual COM port assigned to the board.
 
 ## 6. Optional OTLP export
 
@@ -85,9 +93,11 @@ set OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318/v1/metrics
 python bridge/main.py --port stdin
 ```
 
-## 7. What is verified in-repo vs. external
+## 7. What is verified in-repo vs. on hardware
 
 - **Verified in this repo:** mock-device decoding, state reconstruction, metrics rendering, bridge tests, and CLI/compile checks.
-- **Still external:** flashing firmware to a real `NUCLEO-F401RE` and capturing live serial-to-Grafana evidence.
+- **Verified on real hardware as of 2026-05-10:** firmware build, ST-LINK flashing, live serial ingest over the ST-LINK virtual COM port, Prometheus metric export, and Grafana dashboard rendering for `device_id="nucleo-f401re"`.
 
-See [vnv_repo_completion_status.md](vnv_repo_completion_status.md) for the current verified status.
+See [vnv_repo_completion_status.md](vnv_repo_completion_status.md) for the current verification boundary and
+[`reports/hardware_validation_2026-05-10.md`](reports/hardware_validation_2026-05-10.md)
+for the detailed hardware milestone record.

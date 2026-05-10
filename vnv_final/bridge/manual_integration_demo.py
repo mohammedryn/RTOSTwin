@@ -44,10 +44,15 @@ def run_integration() -> None:
             chunk = mock_proc.stdout.read(1024)
             if not chunk:
                 break
+            if bridge_proc.poll() is not None:
+                print("Bridge process exited; stopping integration demo.")
+                break
             bridge_proc.stdin.write(chunk)
             bridge_proc.stdin.flush()
     except KeyboardInterrupt:
         print("\nStopping integration demo...")
+    except OSError as exc:
+        print(f"Integration demo stopping after pipe error: {exc}")
     finally:
         mock_proc.terminate()
         bridge_proc.terminate()
