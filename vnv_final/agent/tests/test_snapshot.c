@@ -15,6 +15,12 @@
 #include <string.h>
 #include <stdint.h>
 
+/*
+ * Objective 1 audit anchor:
+ * snapshot_capture() must continue using only fixed/static storage and must
+ * not introduce malloc/pvPortMalloc into the telemetry hot path.
+ */
+
 /* ── FreeRTOS Type Stubs ────────────────────────────────────────── */
 typedef uint32_t TickType_t;
 typedef uint32_t UBaseType_t;

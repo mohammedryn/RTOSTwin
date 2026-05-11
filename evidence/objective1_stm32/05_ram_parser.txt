@@ -1,0 +1,38 @@
+(.venv) PS D:\digital_twin> powershell -ExecutionPolicy Bypass -File tools/stm32/measure_agent_size.ps1 -MapFile "C:\Users\rayan\STM32CubeIDE\workspace_2.1.1\RTOSTwinF401RE_clean\STM32CubeIDE\Debug\RTOSTwinF401RE_clean.map"
+Agent .data bytes: 0
+Agent .bss bytes:  2543
+Agent static RAM total bytes: 2543
+
+Section SizeBytes Object
+------- --------- ------
+bss             1 ./Application/User/Core/rtostwin/core/encoder.o
+bss             0 ./Application/User/Core/rtostwin/core/encoder.o
+bss           408 ./Application/User/Core/rtostwin/core/encoder.o
+bss             0 ./Application/User/Core/rtostwin/core/framer.o
+bss             0 ./Application/User/Core/rtostwin/core/measurement.o
+bss             0 ./Application/User/Core/rtostwin/core/profiler.o
+bss             0 ./Application/User/Core/rtostwin/core/snapshot.o
+bss           576 ./Application/User/Core/rtostwin/core/snapshot.o
+bss             2 ./Application/User/Core/rtostwin/core/snapshot.o
+bss             0 ./Application/User/Core/rtostwin/core/transport.o
+bss             4 ./Application/User/Core/rtostwin/core/transport.o
+bss             0 ./Application/User/Core/rtostwin/freertos/hooks.o
+bss            64 ./Application/User/Core/rtostwin/freertos/hooks.o
+bss             4 ./Application/User/Core/rtostwin/freertos/hooks.o
+bss             0 ./Application/User/Core/rtostwin/hal/stm32/dwt.o
+bss             0 ./Application/User/Core/rtostwin/hal/stm32/uart_dma.o
+bss           512 ./Application/User/Core/rtostwin/telemetry_agent.o
+bss           408 ./Application/User/Core/rtostwin/telemetry_agent.o
+bss           540 ./Application/User/Core/rtostwin/telemetry_agent.o
+bss             0 ./Application/User/Core/rtostwin/telemetry_agent.o
+bss            24 ./Application/User/Core/rtostwin/telemetry_agent.o
+data            0 ./Application/User/Core/rtostwin/core/encoder.o
+data            0 ./Application/User/Core/rtostwin/core/framer.o
+data            0 ./Application/User/Core/rtostwin/core/measurement.o
+data            0 ./Application/User/Core/rtostwin/core/profiler.o
+data            0 ./Application/User/Core/rtostwin/core/snapshot.o
+data            0 ./Application/User/Core/rtostwin/core/transport.o
+data            0 ./Application/User/Core/rtostwin/freertos/hooks.o
+data            0 ./Application/User/Core/rtostwin/hal/stm32/dwt.o
+data            0 ./Application/User/Core/rtostwin/hal/stm32/uart_dma.o
+data            0 ./Application/User/Core/rtostwin/telemetry_agent.o

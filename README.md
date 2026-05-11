@@ -10,6 +10,16 @@ The primary validated platform is the `NUCLEO-F401RE`. As of `2026-05-10`, the
 baseline path from real firmware on a real board to a live Grafana dashboard
 has been validated end to end.
 
+For the STM32 baseline, Objective 1 evidence now includes:
+
+- measured cadence: `9.52 Hz`
+- measured telemetry-cycle CPU overhead: `0.869%`
+- measured agent static RAM: `2543 bytes`
+- passing no-allocation hot-path audit
+
+Saved screenshots and terminal captures for this evidence are collected under
+[evidence/objective1_stm32](/D:/digital_twin/evidence/objective1_stm32).
+
 Planned expansion targets:
 
 - `ESP32-P4`
@@ -163,6 +173,8 @@ Validated hardware facts include:
 - the bridge decoded packets continuously with `drops=0` and `seq_gaps=0`
 - Prometheus exposed live RTOS metrics for `device_id="nucleo-f401re"`
 - Grafana rendered live CPU, heap, stack, packet-loss, and OOM-projection data
+- the STM32 Objective 1 closure measurements were captured and archived in
+  `evidence/objective1_stm32/`
 
 Representative validated bridge command:
 

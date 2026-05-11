@@ -9,17 +9,21 @@
 #include "core/snapshot.h"
 #include "core/encoder.h"
 #include "core/framer.h"
+#include "core/measurement.h"
 #include "core/transport.h"
 #include "core/profiler.h"
+#include <stdio.h>
 
 static full_snapshot_t s_current_snapshot;
 static uint8_t s_payload_buffer[512];
 static uint8_t s_framed_buffer[540];
+static measurement_stats_t s_cycle_stats;
 
 void vTelemetryTask(void *pvParameters)
 {
     (void)pvParameters;
 
+    profiler_init();
     snapshot_init();
     encoder_init();
     transport_init();
@@ -28,6 +32,8 @@ void vTelemetryTask(void *pvParameters)
     uint32_t loop_count = 0u;
 
     while (1) {
+        uint32_t cycle_start = profiler_start();
+
         uint32_t t_start = profiler_start();
         snapshot_capture(&s_current_snapshot);
         uint32_t t_elapsed = profiler_stop(t_start);
@@ -54,8 +60,16 @@ void vTelemetryTask(void *pvParameters)
             }
         }
 
+        measurement_record(&s_cycle_stats, profiler_stop(cycle_start));
+
         if ((++loop_count % 100u) == 0u) {
-            profiler_report(&snap_stats, "snapshot_pipeline");
+            profiler_report(&snap_stats, "snapshot_capture");
+            printf("[MEASURE] telemetry_cycle min=%lu max=%lu mean=%lu cycles samples=%lu\n",
+                   (unsigned long)s_cycle_stats.min_cycles,
+                   (unsigned long)s_cycle_stats.max_cycles,
+                   (unsigned long)measurement_mean_cycles(&s_cycle_stats),
+                   (unsigned long)s_cycle_stats.sample_count);
+            measurement_reset(&s_cycle_stats);
         }
 
         vTaskDelay(pdMS_TO_TICKS(100));

@@ -44,6 +44,12 @@ Validated hardware evidence includes:
 - `http://localhost:8000/metrics` exposes live RTOS metrics for `device_id="nucleo-f401re"`
 - Prometheus queries return live values for CPU, heap, per-task CPU, stack watermark, packet loss, and OOM projection
 - the provisioned Grafana dashboard renders live hardware-backed panels successfully
+- measured cadence evidence on the STM32 baseline is `9.52 Hz`
+- measured telemetry-cycle CPU overhead on the STM32 baseline is `0.869%`
+- measured agent static RAM on the STM32 baseline is `2543 bytes`
+- the telemetry hot path passes the no-allocation audit
+- supporting screenshots and terminal captures are stored under
+  [`evidence/objective1_stm32/`](/D:/digital_twin/evidence/objective1_stm32)
 
 See [`reports/hardware_validation_2026-05-10.md`](reports/hardware_validation_2026-05-10.md)
 for the detailed record.
@@ -64,6 +70,7 @@ From this repository we can now claim:
 - the VNV-owned `vnv_final/` software lane is locally reproducible and test-backed
 - the mock-to-metrics observability path is in place
 - the baseline end-to-end `NUCLEO-F401RE -> UART -> Bridge -> Prometheus -> Grafana` path has been validated on real hardware as of `2026-05-10`
+- the STM32 baseline now has measured Objective 1 evidence for cadence, CPU overhead, static RAM, and no-allocation behavior
 
 We cannot honestly claim:
 

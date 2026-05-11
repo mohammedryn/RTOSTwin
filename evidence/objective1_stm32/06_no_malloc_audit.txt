@@ -1,0 +1,4 @@
+(.venv) PS D:\digital_twin> cd D:\digital_twin
+(.venv) PS D:\digital_twin> powershell -ExecutionPolicy Bypass -File tools/stm32/no_malloc_audit.ps1
+No dynamic-allocation calls found in the telemetry hot path.
+(.venv) PS D:\digital_twin>

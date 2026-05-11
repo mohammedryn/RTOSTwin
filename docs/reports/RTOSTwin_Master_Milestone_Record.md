@@ -103,6 +103,36 @@ validated strongly enough to be presented as completed project milestones.
 
 ---
 
+## 4.1 Objective 1 Closure Snapshot - STM32 Baseline
+
+The STM32 interpretation of `Objective 1` is now supported by direct measured
+evidence on `NUCLEO-F401RE`:
+
+- cadence: `9.52 Hz` over a `63 second` bridge capture window, with `drops=0`
+  and `seq_gaps=0`
+- CPU overhead: `72987` mean telemetry-cycle cycles at `84 MHz`
+  = `868.9 us` = `0.869%` of a `100 ms` loop budget
+- static RAM: `2543 bytes` agent-specific `.data + .bss`
+- dynamic-allocation audit: no `malloc`, `calloc`, `realloc`, `free`,
+  `pvPortMalloc`, or `pvPortFree` calls found in the telemetry hot path
+
+Saved evidence bundle:
+
+- [objective1_stm32](/D:/digital_twin/evidence/objective1_stm32)
+
+Against the explicit Objective 1 thresholds:
+
+- `< 2%` CPU overhead: `PASS`
+- `< 10 KB` static RAM: `PASS`
+- no dynamic allocation in hot path: `PASS`
+
+This closes the core engineering acceptance criteria for the STM32 baseline.
+`ESP32-P4` and `Teensy 4.1` are not covered by this milestone, and a long soak
+record is still recommended before claiming perfect formal signoff against the
+full closure plan.
+
+---
+
 ## 5. Chronological Master Milestone History
 
 ### 5.1 Milestone 0 - The Problem Was Identified and Framed Correctly

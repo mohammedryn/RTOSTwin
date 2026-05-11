@@ -1,0 +1,62 @@
+(.venv) PS D:\digital_twin\vnv_final> $Capture = "D:\digital_twin\stm32-profiler-capture.bin"
+(.venv) PS D:\digital_twin\vnv_final>
+(.venv) PS D:\digital_twin\vnv_final> $port = New-Object System.IO.Ports.SerialPort
+(.venv) PS D:\digital_twin\vnv_final> $port.PortName = "COM11"
+(.venv) PS D:\digital_twin\vnv_final> $port.BaudRate = 115200
+(.venv) PS D:\digital_twin\vnv_final> $port.Parity   = [System.IO.Ports.Parity]::None
+(.venv) PS D:\digital_twin\vnv_final> $port.DataBits = 8
+(.venv) PS D:\digital_twin\vnv_final> $port.StopBits = [System.IO.Ports.StopBits]::One
+(.venv) PS D:\digital_twin\vnv_final> $port.ReadTimeout = 250
+(.venv) PS D:\digital_twin\vnv_final>
+(.venv) PS D:\digital_twin\vnv_final> $ms  = New-Object System.IO.MemoryStream
+(.venv) PS D:\digital_twin\vnv_final> $buf = New-Object byte[] 4096
+(.venv) PS D:\digital_twin\vnv_final>
+(.venv) PS D:\digital_twin\vnv_final> try {
+>>     $port.Open()
+>>     Write-Host "Capturing COM11 for 25 seconds..."
+>>
+>>     $sw = [System.Diagnostics.Stopwatch]::StartNew()
+>>     while ($sw.Elapsed.TotalSeconds -lt 25) {
+>>         try {
+>>             $n = $port.Read($buf, 0, $buf.Length)
+>>             if ($n -gt 0) {
+>>                 $ms.Write($buf, 0, $n)
+>>             }
+>>         }
+>>         catch [System.TimeoutException] {
+>>         }
+>>     }
+>> }
+>> finally {
+>>     if ($port -and $port.IsOpen) {
+>>         $port.Close()
+>>     }
+>> }
+Capturing COM11 for 25 seconds...
+(.venv) PS D:\digital_twin\vnv_final>
+(.venv) PS D:\digital_twin\vnv_final> [System.IO.File]::WriteAllBytes($Capture, $ms.ToArray())
+(.venv) PS D:\digital_twin\vnv_final>
+(.venv) PS D:\digital_twin\vnv_final> $text = [System.Text.Encoding]::ASCII.GetString([System.IO.File]::ReadAllBytes($Capture))
+(.venv) PS D:\digital_twin\vnv_final> $matches = [regex]::Matches($text, '\[(?:PROFILER|MEASURE)\][^\r\n]*')
+(.venv) PS D:\digital_twin\vnv_final>
+(.venv) PS D:\digital_twin\vnv_final> if ($matches.Count -eq 0) {
+>>     Write-Host ""
+>>     Write-Host "No [PROFILER]/[MEASURE] lines found."
+>>     Write-Host "Raw capture saved to: $Capture"
+>> } else {
+>>     Write-Host ""
+>>     Write-Host "Extracted timing lines:"
+>>     $matches | ForEach-Object { $_.Value }
+>>     Write-Host ""
+>>     Write-Host "Raw capture saved to: $Capture"
+>> }
+
+Extracted timing lines:
+[PROFILER] snapshot_capture min=58644 max=70770 mean=59012 cycles samples=3500
+[MEASURE] telemetry_cycle min=71759 max=98797 mean=72908 cycles samples=100
+[PROFILER] snapshot_capture min=58644 max=70770 mean=59005 cycles samples=3600
+[MEASURE] telemetry_cycle min=71768 max=98817 mean=72973 cycles samples=100
+[PROFILER] snapshot_capture min=58644 max=70770 mean=58998 cycles samples=3700
+[MEASURE] telemetry_cycle min=71750 max=98624 mean=72987 cycles samples=100
+
+Raw capture saved to: D:\digital_twin\stm32-profiler-capture.bin

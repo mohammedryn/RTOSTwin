@@ -1,0 +1,15 @@
+(.venv) PS D:\digital_twin\vnv_final> python bridge/main.py --port COM11 --baud 115200 --device-id nucleo-f401re
+22:48:56 [INFO] bridge.main: [main] Opened serial port COM11 @ 115200 baud
+22:48:57 [INFO] prometheus_exporter: [prometheus] Metrics server started on port 8000
+22:48:57 [INFO] bridge.main: [main] Prometheus metrics at http://localhost:8000/metrics
+22:48:57 [INFO] bridge.main: [main] OTLP export disabled
+22:48:57 [INFO] bridge.main: [main] Bridge running. Press Ctrl-C to stop.
+22:48:57 [INFO] device_registry: [registry] New device registered: nucleo-f401re
+22:49:07 [INFO] bridge.main: [main] 110 packets received | drops=0 | seq_gaps=0
+22:49:17 [INFO] bridge.main: [main] 210 packets received | drops=0 | seq_gaps=0
+22:49:28 [INFO] bridge.main: [main] 310 packets received | drops=0 | seq_gaps=0
+22:49:38 [INFO] bridge.main: [main] 410 packets received | drops=0 | seq_gaps=0
+22:49:49 [INFO] bridge.main: [main] 510 packets received | drops=0 | seq_gaps=0
+22:49:59 [INFO] bridge.main: [main] 610 packets received | drops=0 | seq_gaps=0
+22:50:10 [INFO] bridge.main: [main] 710 packets received | drops=0 | seq_gaps=0
+22:50:11 [INFO] bridge.main: [main] Stopped by user.

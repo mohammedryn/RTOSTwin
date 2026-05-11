@@ -64,7 +64,7 @@ void profiler_report(const profiler_stats_t *stats, const char *label) {
 
     uint32_t mean = (uint32_t)(stats->total_cycles / stats->call_count);
 
-    printf("[PROFILER] %s: min=%lu max=%lu mean=%lu cycles (n=%lu)\n",
+    printf("[PROFILER] %s min=%lu max=%lu mean=%lu cycles samples=%lu\n",
            label,
            (unsigned long)stats->min_cycles,
            (unsigned long)stats->max_cycles,

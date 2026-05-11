@@ -324,6 +324,14 @@ Intellectual honesty about scope boundaries is as important as the problem state
 4. Provide a reference Grafana dashboard template that works out-of-the-box with Prometheus as the data source, showing all captured RTOS metrics for a single device.
 5. Propose standardized OpenTelemetry semantic conventions for RTOS metrics (metric naming, labels, units) aligned with OTel conventions, submitted as a formal proposal to the OTel semantic conventions working group.
 
+**Objective 1 status update (STM32 baseline):** Achieved on
+`NUCLEO-F401RE` with measured cadence `9.52 Hz`, measured CPU overhead
+`0.869%`, measured agent static RAM `2543 bytes`, and a passing no-allocation
+hot-path audit. Evidence artifacts are collected under
+`evidence/objective1_stm32/`. `ESP32-P4` and `Teensy 4.1` remain future
+expansion targets, and soak-run evidence should still be recorded before
+claiming perfect formal closure against the full STM32 closure runbook.
+
 ### 4.2 Secondary Objectives
 
 6. Achieve 80+ passing unit and integration tests with GitHub Actions CI on every commit.
