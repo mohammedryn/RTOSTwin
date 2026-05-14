@@ -23,7 +23,7 @@ For the STM32 baseline, Objective 1 evidence now includes:
   stable OOM projection `-1.0`, and `drops=0` / `seq_gaps=0`
 
 Saved screenshots and terminal captures for this evidence are collected under
-[evidence/objective1_stm32](/D:/digital_twin/evidence/).
+[evidence/objective1_stm32](https://github.com/mohammedryn/RTOSTwin/tree/main/evidence/objective1_stm32).
 
 Objective 2 bridge-export evidence now includes:
 
@@ -33,7 +33,7 @@ Objective 2 bridge-export evidence now includes:
 - a real hardware OTLP bridge run on `COM11` with `drops=0` and `seq_gaps=0`
 
 Saved screenshots and terminal captures for this evidence are collected under
-[evidence/objective2_bridge_exports](/D:/digital_twin/evidence/objective2_bridge_exports).
+[evidence/objective2_bridge_exports](https://github.com/mohammedryn/RTOSTwin/tree/main/evidence/objective2_bridge_exports).
 
 Objective 3 OOM-analyzer evidence now includes:
 
@@ -47,7 +47,7 @@ Objective 3 OOM-analyzer evidence now includes:
   `device_id="nucleo-f401re"`
 
 Saved screenshots and terminal captures for this evidence are collected under
-[evidence/objective3_oom_validation](/D:/digital_twin/evidence/objective3_oom_validation).
+[evidence/objective3_oom_validation]([/D:/digital_twin/evidence/objective3_oom_validation](https://github.com/mohammedryn/RTOSTwin/tree/main/evidence/objective3_oom_validation)).
 
 Planned expansion targets:
 
