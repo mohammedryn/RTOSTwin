@@ -1,6 +1,21 @@
-# RTOSTwin
+<div align="center">
 
 ![RTOSTwin](Pictorials/image.png)
+
+# RTOSTwin
+
+**Real-Time RTOS Observability.**  
+**FreeRTOS · Prometheus · Grafana · OTLP · NUCLEO-F401RE.**
+
+[Quick Start](docs/quick_start.md) · [Report Bug](https://github.com/mohammedryn/RTOSTwin/issues) · [Request Feature](https://github.com/mohammedryn/RTOSTwin/issues)
+
+![license](https://img.shields.io/badge/license-MIT-blue)
+![python](https://img.shields.io/badge/python-3.11%2B-blue?logo=python&logoColor=white)
+![tests](https://img.shields.io/badge/tests-passing-brightgreen)
+![hardware](https://img.shields.io/badge/hardware-NUCLEO--F401RE-orange)
+![platform](https://img.shields.io/badge/platform-FreeRTOS-red)
+
+</div>
 
 ## RTOS Digital Twin and Observability Bridge
 
