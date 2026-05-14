@@ -1,0 +1,11 @@
+STM32 Soak Run Metadata
+Date: 2026-05-12
+Start Time: 2026-05-12 03:06:58
+Target Duration: 10 hours
+Board: NUCLEO-F401RE
+Firmware Project: RTOSTwinF401RE_clean
+Port: COM11
+Bridge Path: D:\digital_twin\vnv_final\bridge\main.py
+OTLP Enabled: No
+Prometheus Endpoint: http://localhost:8000/metrics
+End Time: 2026-05-12 11:12:40

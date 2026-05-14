@@ -1,4 +1,7 @@
 # RTOSTwin
+
+![RTOSTwin](Pictorials/image.png)
+
 ## RTOS Digital Twin and Observability Bridge
 
 RTOSTwin is an embedded observability system for FreeRTOS. It captures RTOS
@@ -16,9 +19,35 @@ For the STM32 baseline, Objective 1 evidence now includes:
 - measured telemetry-cycle CPU overhead: `0.869%`
 - measured agent static RAM: `2543 bytes`
 - passing no-allocation hot-path audit
+- recorded soak run: `8 hours 5 minutes 42 seconds` with stable heap,
+  stable OOM projection `-1.0`, and `drops=0` / `seq_gaps=0`
 
 Saved screenshots and terminal captures for this evidence are collected under
-[evidence/objective1_stm32](/D:/digital_twin/evidence/objective1_stm32).
+[evidence/objective1_stm32](/D:/digital_twin/evidence/).
+
+Objective 2 bridge-export evidence now includes:
+
+- OTLP collector receipt for both `device_id="mock-stdin"` and
+  `device_id="nucleo-f401re"`
+- Prometheus metric dumps for both mock and real hardware lanes
+- a real hardware OTLP bridge run on `COM11` with `drops=0` and `seq_gaps=0`
+
+Saved screenshots and terminal captures for this evidence are collected under
+[evidence/objective2_bridge_exports](/D:/digital_twin/evidence/objective2_bridge_exports).
+
+Objective 3 OOM-analyzer evidence now includes:
+
+- `5/5` passing analyzer unit tests
+- stable `-1.0` OOM projection for `mock-normal`
+- positive projected OOM value for `mock-leak`
+- stable `-1.0` OOM projection for `mock-saturated`
+- OTLP collector proof for `rtos.heap.oom_projection_seconds` on
+  `device_id="mock-leak-otlp"`
+- stable real-board OOM projection of `-1.0` for
+  `device_id="nucleo-f401re"`
+
+Saved screenshots and terminal captures for this evidence are collected under
+[evidence/objective3_oom_validation](/D:/digital_twin/evidence/objective3_oom_validation).
 
 Planned expansion targets:
 
@@ -31,8 +60,15 @@ The project can honestly claim the following today:
 
 - the baseline `NUCLEO-F401RE -> ST-LINK virtual COM port -> Python bridge ->
   Prometheus -> Grafana` path is validated on real hardware
+- the bridge OTLP fan-out path is validated against a local collector for both
+  mock and real STM32 telemetry streams
+- the bridge OOM analyzer is validated across stable, leaking, saturated, OTLP,
+  and real-board-stable scenarios
 - the validated STM32 firmware baseline is `RTOSTwinF401RE_clean`
-- the clean bridge and dashboard delivery lane is `vnv_final/`
+- `vnv_final/` is the validated implementation subtree retained for
+  compatibility
+- the STM32 baseline satisfies the minimum long-duration soak requirement with
+  a recorded `8 hour 5 minute` run and `97` saved metrics snapshots
 - the legacy root runtime stack has been archived so the active implementation
   path is no longer split across two parallel locations
 - live RTOS metrics are flowing for CPU, per-task CPU, heap, stack watermark,
@@ -43,8 +79,27 @@ The project should not yet overclaim the following:
 - that `ESP32-P4` and `Teensy 4.1` are validated to the same level
 - that every historical STM32 project folder in the repo is part of the final
   validated path
-- that long-duration soak, WCET, overhead, and stress characterization are
-  fully complete
+- that WCET and broader stress characterization are fully complete beyond the
+  currently recorded STM32 soak window
+
+## Repository Layout
+
+The repository uses a professional alias model:
+
+- the repo root is the public-facing project surface
+- `vnv_final/` is the validated implementation subtree retained for compatibility
+- formal reports live under `docs/reports/`
+- saved milestone proof lives under `evidence/`
+
+Quick map:
+
+- `docs/` - reports, specs, plans, and validation records
+- `evidence/` - screenshots, terminal captures, and proof artifacts
+- `tools/` - helper scripts and audits
+- `archive/` - superseded material kept for reference
+- `vnv_final/` - validated implementation subtree
+
+For a fuller description, see [docs/repository_layout.md](docs/repository_layout.md).
 
 ## Why RTOSTwin Exists
 
@@ -175,6 +230,15 @@ Validated hardware facts include:
 - Grafana rendered live CPU, heap, stack, packet-loss, and OOM-projection data
 - the STM32 Objective 1 closure measurements were captured and archived in
   `evidence/objective1_stm32/`
+- Objective 2 export evidence was captured and archived in
+  `evidence/objective2_bridge_exports/`, including OTLP collector logs and
+  Prometheus metric dumps for mock and real hardware lanes
+- Objective 3 OOM-analyzer evidence was captured and archived in
+  `evidence/objective3_oom_validation/`, including stable, leak, saturated,
+  OTLP, and real-hardware stability checks
+- the STM32 soak evidence was captured and archived in
+  `evidence/objective1_stm32/soak_2026-05-12/`, including bridge logs, compact
+  metrics summaries, metadata, and start/end screenshots
 
 Representative validated bridge command:
 
@@ -219,7 +283,13 @@ What these metrics are for:
 
 ## Quick Start
 
-The current validated workflow lives in `vnv_final/`.
+`vnv_final/` is the validated implementation subtree retained for compatibility.
+It contains the active `agent`, `bridge`, `dashboard`, `semantic-conventions`,
+and local observability stack assets used by the current proven workflow.
+
+For embedding the agent into another STM32 FreeRTOS firmware project, use the
+public C API in `vnv_final/agent/include/rtostwin.h` and the guide at
+[docs/guides/embed_rtostwin_in_stm32.md](docs/guides/embed_rtostwin_in_stm32.md).
 
 ### 1. Start in the validated subtree
 
@@ -267,7 +337,7 @@ Full quick-start details:
 
 - [Validated quick start](vnv_final/docs/quick_start.md)
 
-## Repository Layout
+## Repository Tree
 
 The repository contains both canonical project-level documents and the current
 validated delivery lane:
@@ -289,6 +359,12 @@ digital_twin/
 |   |   `-- RTOSTwin_Complete_Report.md
 |   `-- quick_start.md
 |   `-- wire_format_spec.md
+|-- evidence/
+|   |-- objective1_stm32/
+|   |-- objective2_bridge_exports/
+|   `-- objective3_oom_validation/
+|-- graphify-out/
+|-- tools/
 |-- vnv_final/
 |   |-- agent/
 |   |-- bridge/
@@ -306,11 +382,17 @@ How to think about the layout:
   truth documents
 - `docs/wire_format_spec.md` and `agent/core/wire_format.h` are the canonical
   protocol contract
-- `vnv_final/` is the clean implementation and demo-readiness lane for the
-  validated hardware-to-dashboard path
+- `vnv_final/` is the validated implementation subtree retained for
+  compatibility with the current proven hardware-to-dashboard path
 - `archive/legacy/root-runtime-snapshot-2026-05-10/` preserves the older
   root runtime stack for reference without letting it compete with the current
   implementation lane
+- raw capture byproducts used during STM32 validation belong under the
+  relevant `evidence/` subtree rather than at the repository root; the moved
+  profiler capture now lives at
+  `evidence/objective1_stm32/raw/stm32-profiler-capture.bin`
+- `log.md` is retained at the repository root as a referenced historical audit
+  artifact and is not the main project narrative
 
 ## Documentation Map
 
@@ -341,10 +423,9 @@ What is complete:
 
 What is in progress or next:
 
-- long-duration soak validation
 - measured overhead and timing characterization
 - stress testing and threshold-setting for alerts
-- cleanup and consolidation around the validated baseline
+- Objective 5 semantic-conventions submission closure
 - additional board ports
 
 ## Roadmap
@@ -352,11 +433,11 @@ What is in progress or next:
 Near-term work should focus on hardening the validated baseline before platform
 expansion:
 
-1. run long-duration soak tests on the `NUCLEO-F401RE`
+1. finish Objective 5 semantic-conventions submission work
 2. measure WCET, overhead, and memory cost on the real validated firmware
 3. define alert thresholds for stack margin, heap pressure, and packet loss
 4. validate dashboard behavior under stress and fault scenarios
-5. clean up legacy paths and reduce ambiguity around the canonical build lane
+5. continue cleanup and consolidation around the canonical build lane
 6. port the same validated architecture to `ESP32-P4` and `Teensy 4.1`
 
 ## Claim Boundaries

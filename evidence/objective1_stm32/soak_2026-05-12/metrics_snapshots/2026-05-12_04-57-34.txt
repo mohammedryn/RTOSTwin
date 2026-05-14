@@ -1,0 +1,50 @@
+# HELP rtos_task_state 1 if the task is currently in the labelled state, 0 otherwise
+# TYPE rtos_task_state gauge
+rtos_task_state{device_id="nucleo-f401re",state="running",task_name="TelemetryTask"} 1.0
+rtos_task_state{device_id="nucleo-f401re",state="ready",task_name="TelemetryTask"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="blocked",task_name="TelemetryTask"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="suspended",task_name="TelemetryTask"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="deleted",task_name="TelemetryTask"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="running",task_name="IDLE"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="ready",task_name="IDLE"} 1.0
+rtos_task_state{device_id="nucleo-f401re",state="blocked",task_name="IDLE"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="suspended",task_name="IDLE"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="deleted",task_name="IDLE"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="running",task_name="defaultTask"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="ready",task_name="defaultTask"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="blocked",task_name="defaultTask"} 1.0
+rtos_task_state{device_id="nucleo-f401re",state="suspended",task_name="defaultTask"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="deleted",task_name="defaultTask"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="running",task_name="Tmr Svc"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="ready",task_name="Tmr Svc"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="blocked",task_name="Tmr Svc"} 1.0
+rtos_task_state{device_id="nucleo-f401re",state="suspended",task_name="Tmr Svc"} 0.0
+rtos_task_state{device_id="nucleo-f401re",state="deleted",task_name="Tmr Svc"} 0.0
+# HELP rtos_task_stack_watermark_bytes Stack high-watermark: bytes remaining before stack overflow
+# TYPE rtos_task_stack_watermark_bytes gauge
+rtos_task_stack_watermark_bytes{device_id="nucleo-f401re",task_name="TelemetryTask"} 1196.0
+rtos_task_stack_watermark_bytes{device_id="nucleo-f401re",task_name="IDLE"} 416.0
+rtos_task_stack_watermark_bytes{device_id="nucleo-f401re",task_name="defaultTask"} 360.0
+rtos_task_stack_watermark_bytes{device_id="nucleo-f401re",task_name="Tmr Svc"} 856.0
+# HELP rtos_task_cpu_ratio Per-task CPU utilization as a fraction 0.0-1.0
+# TYPE rtos_task_cpu_ratio gauge
+rtos_task_cpu_ratio{device_id="nucleo-f401re",task_name="TelemetryTask"} 0.10634864186001651
+rtos_task_cpu_ratio{device_id="nucleo-f401re",task_name="IDLE"} 0.729677458384733
+rtos_task_cpu_ratio{device_id="nucleo-f401re",task_name="defaultTask"} 0.1639735594431194
+rtos_task_cpu_ratio{device_id="nucleo-f401re",task_name="Tmr Svc"} 3.4031213109942e-07
+# HELP rtos_heap_free_bytes Current free heap in bytes (xPortGetFreeHeapSize)
+# TYPE rtos_heap_free_bytes gauge
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+# HELP rtos_heap_min_ever_bytes Lowest free heap ever observed (xPortGetMinimumEverFreeHeapSize)
+# TYPE rtos_heap_min_ever_bytes gauge
+rtos_heap_min_ever_bytes{device_id="nucleo-f401re"} 12568.0
+# HELP rtos_heap_oom_projection_seconds Projected seconds until heap OOM. -1 means no leak detected.
+# TYPE rtos_heap_oom_projection_seconds gauge
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+# HELP rtos_cpu_utilization_ratio Total system CPU utilization as a fraction 0.0-1.0
+# TYPE rtos_cpu_utilization_ratio gauge
+rtos_cpu_utilization_ratio{device_id="nucleo-f401re"} 1.0
+# HELP rtos_telemetry_packet_loss_ratio Fraction of telemetry packets dropped (sequence gap detection)
+# TYPE rtos_telemetry_packet_loss_ratio gauge
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+

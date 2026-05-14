@@ -328,9 +328,32 @@ Intellectual honesty about scope boundaries is as important as the problem state
 `NUCLEO-F401RE` with measured cadence `9.52 Hz`, measured CPU overhead
 `0.869%`, measured agent static RAM `2543 bytes`, and a passing no-allocation
 hot-path audit. Evidence artifacts are collected under
-`evidence/objective1_stm32/`. `ESP32-P4` and `Teensy 4.1` remain future
-expansion targets, and soak-run evidence should still be recorded before
-claiming perfect formal closure against the full STM32 closure runbook.
+`evidence/objective1_stm32/`. A long-duration STM32 soak run has now also been
+recorded for `8 hours 5 minutes 42 seconds`, with the bridge staying alive,
+`drops=0`, `seq_gaps=0`, stable `rtos_heap_oom_projection_seconds = -1.0`,
+stable packet-loss ratio `0.0`, and stable `rtos_heap_free_bytes = 12568.0`
+across the saved summary tail. `ESP32-P4` and `Teensy 4.1` remain future
+expansion targets.
+
+**Objective 2 status update (bridge exports):** Achieved on both the mock
+bridge lane and the real `NUCLEO-F401RE` hardware lane. With
+`RTOSTWIN_ENABLE_OTLP=1` and
+`OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318/v1/metrics`, the bridge
+exported the expected RTOS metric families to a local OTLP collector and to the
+Prometheus `/metrics` endpoint for `device_id="mock-stdin"` and
+`device_id="nucleo-f401re"`. The real hardware OTLP run also held `drops=0`
+and `seq_gaps=0` while streaming over `COM11`. Evidence artifacts are collected
+under `evidence/objective2_bridge_exports/`.
+
+**Objective 3 status update (OOM analyzer):** Achieved on the current bridge
+implementation. The analyzer passed its dedicated pytest suite (`5/5`), stayed
+stable at `-1.0` for `mock-normal`, produced a positive projected
+`rtos_heap_oom_projection_seconds` value of `1193.3716085975489` for
+`mock-leak`, stayed stable at `-1.0` for `mock-saturated`, exported
+`rtos.heap.oom_projection_seconds` through the OTLP path for
+`device_id="mock-leak-otlp"`, and stayed stable at `-1.0` on the real
+`NUCLEO-F401RE` hardware lane for `device_id="nucleo-f401re"`. Evidence
+artifacts are collected under `evidence/objective3_oom_validation/`.
 
 ### 4.2 Secondary Objectives
 

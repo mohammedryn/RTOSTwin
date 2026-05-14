@@ -1,0 +1,8 @@
+#ifndef RTOSTWIN_CONFIG_H
+#define RTOSTWIN_CONFIG_H
+
+#define RTOSTWIN_ENABLE 0
+#define RTOSTWIN_ENABLE_COMPAT_API 1
+#define RTOSTWIN_VERSION_STRING "test-disabled"
+
+#endif /* RTOSTWIN_CONFIG_H */

@@ -5,6 +5,12 @@ observability stack. The real `NUCLEO-F401RE` path has now been validated end
 to end; see [`reports/hardware_validation_2026-05-10.md`](reports/hardware_validation_2026-05-10.md)
 for the recorded board, firmware, and metric evidence.
 
+This guide assumes you are intentionally working inside the compatibility-preserved
+validated implementation subtree `vnv_final/`.
+
+For the public project overview and milestone/evidence summary, use the root
+`README.md` first.
+
 ## 1. Start in the correct working tree
 
 ```bash

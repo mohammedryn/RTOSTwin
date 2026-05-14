@@ -1,0 +1,488 @@
+Metrics snapshot loop started: 2026-05-12 03:06:48
+
+[2026-05-12_03-06-48]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_03-11-50]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_03-16-52]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_03-21-54]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_03-26-56]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_03-31-59]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_03-37-01]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_03-42-03]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_03-47-05]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_03-52-07]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_03-57-09]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_04-02-11]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_04-07-13]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_04-12-15]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_04-17-17]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_04-22-20]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_04-27-22]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_04-32-24]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_04-37-26]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_04-42-28]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_04-47-30]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_04-52-32]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_04-57-34]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_05-02-36]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_05-07-38]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_05-12-40]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_05-17-43]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_05-22-45]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_05-27-47]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_05-32-49]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_05-37-51]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_05-42-53]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_05-47-55]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_05-52-57]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_05-57-59]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_06-03-01]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_06-08-03]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_06-13-06]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_06-18-08]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_06-23-10]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_06-28-12]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_06-33-14]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_06-38-16]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_06-43-18]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_06-48-20]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_06-53-22]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_06-58-24]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_07-03-26]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_07-08-28]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_07-13-31]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_07-18-33]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_07-23-35]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_07-28-37]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_07-33-39]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_07-38-41]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_07-43-43]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_07-48-45]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_07-53-47]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_07-58-49]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_08-03-51]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_08-08-53]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_08-13-56]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_08-18-58]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_08-24-00]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_08-29-02]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_08-34-04]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_08-39-06]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_08-44-08]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_08-49-10]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_08-54-12]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_08-59-14]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_09-04-16]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_09-09-19]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_09-14-21]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_09-19-23]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_09-24-25]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_09-29-27]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_09-34-29]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_09-39-31]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_09-44-33]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_09-49-35]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_09-54-37]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_09-59-39]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_10-04-42]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_10-09-44]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_10-14-46]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_10-19-48]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_10-24-50]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_10-29-52]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_10-34-54]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_10-39-56]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_10-44-58]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_10-50-00]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_10-55-02]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_11-00-05]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_11-05-07]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+[2026-05-12_11-10-09]
+rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} -1.0
+rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} 0.0
+rtos_heap_free_bytes{device_id="nucleo-f401re"} 12568.0
+
+Metrics snapshot loop ended: 2026-05-12 11:12:25

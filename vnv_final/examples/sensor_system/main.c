@@ -11,10 +11,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
-#include "agent/core/snapshot.h"
-#include "agent/core/encoder.h"
-#include "agent/core/framer.h"
-#include "agent/core/transport.h"
+#include "../../agent/include/rtostwin.h"
 
 static QueueHandle_t xSensorQueue;
 
@@ -44,8 +41,6 @@ void vCommsTask(void *pvParameters) {
     }
 }
 
-extern void StartTelemetryAgent(void);
-
 int main(void) {
     xSensorQueue = xQueueCreate(10, sizeof(uint32_t));
     
@@ -53,7 +48,8 @@ int main(void) {
     xTaskCreate(vProcessingTask, "Processor",  256, NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(vCommsTask,      "Comms",      256, NULL, tskIDLE_PRIORITY + 1, NULL);
     
-    StartTelemetryAgent();
+    (void)rtostwin_init();
+    (void)rtostwin_start();
     
     vTaskStartScheduler();
     for (;;);

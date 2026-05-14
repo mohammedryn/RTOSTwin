@@ -127,9 +127,132 @@ Against the explicit Objective 1 thresholds:
 - no dynamic allocation in hot path: `PASS`
 
 This closes the core engineering acceptance criteria for the STM32 baseline.
-`ESP32-P4` and `Teensy 4.1` are not covered by this milestone, and a long soak
-record is still recommended before claiming perfect formal signoff against the
-full closure plan.
+`ESP32-P4` and `Teensy 4.1` are not covered by this milestone.
+
+### Soak Evidence Addendum
+
+The STM32 baseline now also has a recorded long-duration soak run:
+
+- start: `2026-05-12 03:06:58`
+- end: `2026-05-12 11:12:40`
+- duration: `8 hours 5 minutes 42 seconds`
+- snapshot count: `97`
+- bridge remained alive through the end of the run
+- packet flow remained healthy with `drops=0` and `seq_gaps=0`
+- compact summary tail stayed stable with:
+  - `rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} = -1.0`
+  - `rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} = 0.0`
+  - `rtos_heap_free_bytes{device_id="nucleo-f401re"} = 12568.0`
+
+Saved soak evidence bundle:
+
+- [00_soak_metadata.txt](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/00_soak_metadata.txt)
+- [01_bridge_soak_log.txt](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/01_bridge_soak_log.txt)
+- [02_metrics_snapshot_summary.txt](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/02_metrics_snapshot_summary.txt)
+- [01_bridge_started.png](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/screenshots/01_bridge_started.png)
+- [05_bridge_end.png](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/screenshots/05_bridge_end.png)
+- [06_metrics_summary_end.png](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/screenshots/06_metrics_summary_end.png)
+- [07_snapshot_count.png](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/screenshots/07_snapshot_count.png)
+
+This satisfies the minimum `6-hour` soak requirement for the STM32 closure
+runbook and upgrades the STM32 baseline from “engineering-complete” to
+“formally signoff-ready” within the current project boundary.
+
+---
+
+## 4.2 Objective 2 Closure Snapshot - Bridge Exports
+
+The bridge interpretation of `Objective 2` is now supported by direct saved
+evidence from both the mock lane and the real STM32 hardware lane:
+
+- OTLP export explicitly enabled with `RTOSTWIN_ENABLE_OTLP=1`
+- OTLP endpoint explicitly set to `http://localhost:4318/v1/metrics`
+- mock bridge lane exported RTOS metrics for `device_id="mock-stdin"` to a
+  local collector and to the Prometheus `/metrics` endpoint
+- real hardware bridge lane exported RTOS metrics for
+  `device_id="nucleo-f401re"` to the same local collector and to the
+  Prometheus `/metrics` endpoint
+- real hardware OTLP bridge run stayed healthy with `drops=0` and
+  `seq_gaps=0`
+
+The saved collector logs and Prometheus dumps confirm the expected RTOS metric
+families were present on both paths:
+
+- `rtos.heap.free_bytes`
+- `rtos.heap.min_ever_bytes`
+- `rtos.heap.oom_projection_seconds`
+- `rtos.cpu.utilization_ratio`
+- `rtos.telemetry.packet_loss_ratio`
+- `rtos.task.state`
+- `rtos.task.stack_watermark`
+- `rtos.task.cpu_ratio`
+
+Saved evidence bundle:
+
+- [objective2_bridge_exports](/D:/digital_twin/evidence/objective2_bridge_exports)
+
+Representative saved artifacts:
+
+- [03_mock_otlp_collector.txt](/D:/digital_twin/evidence/objective2_bridge_exports/03_mock_otlp_collector.txt)
+- [04_prometheus_metrics.txt](/D:/digital_twin/evidence/objective2_bridge_exports/04_prometheus_metrics.txt)
+- [05_hw_otlp_bridge.txt](/D:/digital_twin/evidence/objective2_bridge_exports/05_hw_otlp_bridge.txt)
+- [06_hw_otlp_collector.txt](/D:/digital_twin/evidence/objective2_bridge_exports/06_hw_otlp_collector.txt)
+- [07_hw_prometheus_metrics.txt](/D:/digital_twin/evidence/objective2_bridge_exports/07_hw_prometheus_metrics.txt)
+
+This closes the core engineering acceptance criteria for Objective 2 on the
+current validated bridge implementation.
+
+---
+
+## 4.3 Objective 3 Closure Snapshot - OOM Analyzer
+
+The bridge interpretation of `Objective 3` is now supported by direct saved
+evidence from unit tests, controlled mock scenarios, OTLP export logs, and the
+real STM32 hardware lane:
+
+- the dedicated analyzer test suite passed `5/5`
+- `mock-normal` stayed stable with
+  `rtos_heap_oom_projection_seconds{device_id="mock-normal"} = -1.0`
+- `mock-leak` produced a positive projected OOM value of
+  `1193.3716085975489`
+- `mock-saturated` stayed stable with
+  `rtos_heap_oom_projection_seconds{device_id="mock-saturated"} = -1.0`
+- the OTLP collector logs captured `rtos.heap.oom_projection_seconds` for
+  `device_id="mock-leak-otlp"`
+- the real STM32 hardware lane stayed stable with
+  `rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} = -1.0`
+
+This evidence shows the analyzer does all of the required things:
+
+- avoids false positives on stable and high-load non-leaking systems
+- detects a controlled sustained leak and projects time-to-OOM
+- exports the OOM projection through both Prometheus and OTLP paths
+- remains stable on the validated `NUCLEO-F401RE` baseline
+
+Saved evidence bundle:
+
+- [objective3_oom_validation](/D:/digital_twin/evidence/objective3_oom_validation)
+
+Representative saved artifacts:
+
+- [02_mock_normal_metrics.txt](/D:/digital_twin/evidence/objective3_oom_validation/02_mock_normal_metrics.txt)
+- [03_mock_leak_metrics.txt](/D:/digital_twin/evidence/objective3_oom_validation/03_mock_leak_metrics.txt)
+- [04_mock_saturated_metrics.txt](/D:/digital_twin/evidence/objective3_oom_validation/04_mock_saturated_metrics.txt)
+- [06_hw_stable_metrics.txt](/D:/digital_twin/evidence/objective3_oom_validation/06_hw_stable_metrics.txt)
+- [terminal1txt](/D:/digital_twin/evidence/objective3_oom_validation/terminal1txt)
+- [terminal2.txt](/D:/digital_twin/evidence/objective3_oom_validation/terminal2.txt)
+
+Note on OTLP evidence packaging:
+
+- [05_mock_leak_otlp_collector.txt](/D:/digital_twin/evidence/objective3_oom_validation/05_mock_leak_otlp_collector.txt)
+  only contains the later `docker logs` failure after the collector had already
+  exited, so the authoritative OTLP proof for Objective 3 is the saved live
+  collector output in [terminal1txt](/D:/digital_twin/evidence/objective3_oom_validation/terminal1txt)
+  plus the matching bridge output in
+  [terminal2.txt](/D:/digital_twin/evidence/objective3_oom_validation/terminal2.txt).
+
+This closes the core engineering acceptance criteria for Objective 3 on the
+current validated bridge implementation.
 
 ---
 

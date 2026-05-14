@@ -1,0 +1,21 @@
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Users\rayan> cd D:\digital_twin\vnv_final
+PS D:\digital_twin\vnv_final> .\.venv\Scripts\Activate.ps1
+(.venv) PS D:\digital_twin\vnv_final> $env:RTOSTWIN_ENABLE_OTLP="1"
+(.venv) PS D:\digital_twin\vnv_final> $env:OTEL_EXPORTER_OTLP_ENDPOINT="http://localhost:4318/v1/metrics"
+(.venv) PS D:\digital_twin\vnv_final> python bridge/main.py --port COM11 --baud 115200 --device-id nucleo-f401re
+00:02:52 [INFO] bridge.main: [main] Opened serial port COM11 @ 115200 baud
+00:02:52 [INFO] otlp_exporter: [otlp] Exporting to http://localhost:4318/v1/metrics every 30000 ms
+00:02:54 [INFO] prometheus_exporter: [prometheus] Metrics server started on port 8000
+00:02:54 [INFO] bridge.main: [main] Prometheus metrics at http://localhost:8000/metrics
+00:02:54 [INFO] bridge.main: [main] OTLP export enabled
+00:02:54 [INFO] bridge.main: [main] Bridge running. Press Ctrl-C to stop.
+00:02:54 [INFO] device_registry: [registry] New device registered: nucleo-f401re
+00:03:04 [INFO] bridge.main: [main] 114 packets received | drops=0 | seq_gaps=0
+00:03:14 [INFO] bridge.main: [main] 211 packets received | drops=0 | seq_gaps=0
+00:03:24 [INFO] bridge.main: [main] 311 packets received | drops=0 | seq_gaps=0
+00:03:35 [INFO] bridge.main: [main] 411 packets received | drops=0 | seq_gaps=0
+00:03:45 [INFO] bridge.main: [main] 509 packets received | drops=0 | seq_gaps=0
+00:03:55 [INFO] bridge.main: [main] 606 packets received | drops=0 | seq_gaps=0
+00:04:05 [INFO] bridge.main: [main] 706 packets received | drops=0 | seq_gaps=0

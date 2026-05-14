@@ -1,0 +1,50 @@
+# HELP rtos_task_state 1 if the task is currently in the labelled state, 0 otherwise
+# TYPE rtos_task_state gauge
+rtos_task_state{device_id="mock-saturated",state="running",task_name="SensorTask"} 1.0
+rtos_task_state{device_id="mock-saturated",state="ready",task_name="SensorTask"} 0.0
+rtos_task_state{device_id="mock-saturated",state="blocked",task_name="SensorTask"} 0.0
+rtos_task_state{device_id="mock-saturated",state="suspended",task_name="SensorTask"} 0.0
+rtos_task_state{device_id="mock-saturated",state="deleted",task_name="SensorTask"} 0.0
+rtos_task_state{device_id="mock-saturated",state="running",task_name="CommsTask"} 0.0
+rtos_task_state{device_id="mock-saturated",state="ready",task_name="CommsTask"} 1.0
+rtos_task_state{device_id="mock-saturated",state="blocked",task_name="CommsTask"} 0.0
+rtos_task_state{device_id="mock-saturated",state="suspended",task_name="CommsTask"} 0.0
+rtos_task_state{device_id="mock-saturated",state="deleted",task_name="CommsTask"} 0.0
+rtos_task_state{device_id="mock-saturated",state="running",task_name="ProcTask"} 0.0
+rtos_task_state{device_id="mock-saturated",state="ready",task_name="ProcTask"} 1.0
+rtos_task_state{device_id="mock-saturated",state="blocked",task_name="ProcTask"} 0.0
+rtos_task_state{device_id="mock-saturated",state="suspended",task_name="ProcTask"} 0.0
+rtos_task_state{device_id="mock-saturated",state="deleted",task_name="ProcTask"} 0.0
+rtos_task_state{device_id="mock-saturated",state="running",task_name="IDLE"} 0.0
+rtos_task_state{device_id="mock-saturated",state="ready",task_name="IDLE"} 1.0
+rtos_task_state{device_id="mock-saturated",state="blocked",task_name="IDLE"} 0.0
+rtos_task_state{device_id="mock-saturated",state="suspended",task_name="IDLE"} 0.0
+rtos_task_state{device_id="mock-saturated",state="deleted",task_name="IDLE"} 0.0
+# HELP rtos_task_stack_watermark_bytes Stack high-watermark: bytes remaining before stack overflow
+# TYPE rtos_task_stack_watermark_bytes gauge
+rtos_task_stack_watermark_bytes{device_id="mock-saturated",task_name="SensorTask"} 256.0
+rtos_task_stack_watermark_bytes{device_id="mock-saturated",task_name="CommsTask"} 320.0
+rtos_task_stack_watermark_bytes{device_id="mock-saturated",task_name="ProcTask"} 384.0
+rtos_task_stack_watermark_bytes{device_id="mock-saturated",task_name="IDLE"} 512.0
+# HELP rtos_task_cpu_ratio Per-task CPU utilization as a fraction 0.0-1.0
+# TYPE rtos_task_cpu_ratio gauge
+rtos_task_cpu_ratio{device_id="mock-saturated",task_name="SensorTask"} 0.37037037037037035
+rtos_task_cpu_ratio{device_id="mock-saturated",task_name="CommsTask"} 0.3333333333333333
+rtos_task_cpu_ratio{device_id="mock-saturated",task_name="ProcTask"} 0.2777777777777778
+rtos_task_cpu_ratio{device_id="mock-saturated",task_name="IDLE"} 0.018518518518518517
+# HELP rtos_heap_free_bytes Current free heap in bytes (xPortGetFreeHeapSize)
+# TYPE rtos_heap_free_bytes gauge
+rtos_heap_free_bytes{device_id="mock-saturated"} 131072.0
+# HELP rtos_heap_min_ever_bytes Lowest free heap ever observed (xPortGetMinimumEverFreeHeapSize)
+# TYPE rtos_heap_min_ever_bytes gauge
+rtos_heap_min_ever_bytes{device_id="mock-saturated"} 131072.0
+# HELP rtos_heap_oom_projection_seconds Projected seconds until heap OOM. -1 means no leak detected.
+# TYPE rtos_heap_oom_projection_seconds gauge
+rtos_heap_oom_projection_seconds{device_id="mock-saturated"} -1.0
+# HELP rtos_cpu_utilization_ratio Total system CPU utilization as a fraction 0.0-1.0
+# TYPE rtos_cpu_utilization_ratio gauge
+rtos_cpu_utilization_ratio{device_id="mock-saturated"} 0.95
+# HELP rtos_telemetry_packet_loss_ratio Fraction of telemetry packets dropped (sequence gap detection)
+# TYPE rtos_telemetry_packet_loss_ratio gauge
+rtos_telemetry_packet_loss_ratio{device_id="mock-saturated"} 0.0
+

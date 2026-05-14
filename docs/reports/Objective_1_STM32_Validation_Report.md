@@ -137,16 +137,40 @@ Evidence artifacts:
 
 | Field | Result |
 |---|---|
-| Start time | |
-| End time | |
-| Duration | |
-| Firmware alive throughout | |
-| Bridge alive throughout | |
-| Packet loss result | |
-| Heap free stability | |
-| Heap min-ever stability | |
-| OOM projection stability | |
-| Final verdict | |
+| Start time | `2026-05-12 03:06:58` |
+| End time | `2026-05-12 11:12:40` |
+| Duration | `8 hours 5 minutes 42 seconds` |
+| Firmware alive throughout | `PASS` |
+| Bridge alive throughout | `PASS` |
+| Packet loss result | `PASS` (`drops=0`, `seq_gaps=0`, metrics packet-loss ratio `0.0`) |
+| Heap free stability | `PASS` (`12568.0` throughout the sampled summary tail) |
+| Heap min-ever stability | `Not separately recorded in the compact soak summary` |
+| OOM projection stability | `PASS` (`-1.0` throughout the sampled summary tail) |
+| Final verdict | `PASS` |
+
+Soak evidence highlights:
+
+- bridge log remained active until manual stop, with packet counts still
+  increasing near the end of the run
+- bridge tail remained at `drops=0` and `seq_gaps=0`
+- compact metrics summary stayed stable across the tail window:
+  - `rtos_heap_oom_projection_seconds{device_id="nucleo-f401re"} = -1.0`
+  - `rtos_telemetry_packet_loss_ratio{device_id="nucleo-f401re"} = 0.0`
+  - `rtos_heap_free_bytes{device_id="nucleo-f401re"} = 12568.0`
+- snapshot capture count: `97` files in `metrics_snapshots/`
+
+Soak evidence artifacts:
+
+- Metadata: [00_soak_metadata.txt](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/00_soak_metadata.txt)
+- Bridge log: [01_bridge_soak_log.txt](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/01_bridge_soak_log.txt)
+- Metrics summary: [02_metrics_snapshot_summary.txt](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/02_metrics_snapshot_summary.txt)
+- Start bridge screenshot: [01_bridge_started.png](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/screenshots/01_bridge_started.png)
+- Start metrics-loop screenshot: [02_metrics_snapshot_loop.png](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/screenshots/02_metrics_snapshot_loop.png)
+- Start metrics-summary screenshot: [03_metrics_summary_started.png](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/screenshots/03_metrics_summary_started.png)
+- Soak metadata screenshot: [04_soak_metadata.png](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/screenshots/04_soak_metadata.png)
+- End bridge screenshot: [05_bridge_end.png](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/screenshots/05_bridge_end.png)
+- End metrics-summary screenshot: [06_metrics_summary_end.png](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/screenshots/06_metrics_summary_end.png)
+- Snapshot-count screenshot: [07_snapshot_count.png](/D:/digital_twin/evidence/objective1_stm32/soak_2026-05-12/screenshots/07_snapshot_count.png)
 
 ## Final Objective 1 Verdict
 
@@ -161,6 +185,7 @@ Measured closure evidence:
 - dynamic-allocation audit: `PASS`
 
 This report closes the core engineering acceptance criteria for the STM32
-baseline only. `ESP32-P4` and `Teensy 4.1` remain future work. A `6-hour`
-soak run record is still recommended before claiming perfect formal signoff
-against the full closure runbook.
+baseline only. `ESP32-P4` and `Teensy 4.1` remain future work. The minimum
+`6-hour` soak requirement is now satisfied by the recorded `8 hour 5 minute`
+STM32 soak run, so the STM32 baseline can be treated as formally signoff-ready
+within the current closure runbook.

@@ -8,10 +8,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
-#include "agent/core/snapshot.h"
-#include "agent/core/encoder.h"
-#include "agent/core/framer.h"
-#include "agent/core/transport.h"
+#include "../../agent/include/rtostwin.h"
 
 /* 
  * Task 1: Blinky
@@ -30,12 +27,6 @@ void vBlinkyTask(void *pvParameters) {
     }
 }
 
-/* 
- * Telemetry Task
- * Periodically captures and sends RTOS metrics.
- */
-extern void StartTelemetryAgent(void);
-
 int main(void) {
     /* 1. Hardware Initialization (HAL_Init, SystemClock_Config, etc.) */
     // HAL_Init();
@@ -45,7 +36,8 @@ int main(void) {
     
     /* 3. Start the RTOSTwin Telemetry Agent */
     /* This starts a separate low-priority task to handle telemetry */
-    StartTelemetryAgent();
+    (void)rtostwin_init();
+    (void)rtostwin_start();
     
     /* 4. Start Scheduler */
     vTaskStartScheduler();

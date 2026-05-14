@@ -1,0 +1,622 @@
+PS C:\Users\rayan> docker logs otlp_collector_obj2 > D:\digital_twin\evidence\objective3_oom_validation\05_mock_leak_otlp_collector.txt
+2026-05-11T20:37:28.865Z        info    service@v0.151.0/service.go:241 Starting otelcol-contrib...     {"resource": {"service.instance.id": "4c74b8a2-4cfd-41c8-b565-41aee7c083c2", "service.name": "otelcol-contrib", "service.version": "0.151.0"}, "Version": "0.151.0", "NumCPU": 20}
+2026-05-11T20:37:28.866Z        info    extensions/extensions.go:41     Starting extensions...  {"resource": {"service.instance.id": "4c74b8a2-4cfd-41c8-b565-41aee7c083c2", "service.name": "otelcol-contrib", "service.version": "0.151.0"}}
+2026-05-11T20:37:28.870Z        info    otlpreceiver@v0.151.0/otlp.go:175       Starting HTTP server    {"resource": {"service.instance.id": "4c74b8a2-4cfd-41c8-b565-41aee7c083c2", "service.name": "otelcol-contrib", "service.version": "0.151.0"}, "otelcol.component.id": "otlp", "otelcol.component.kind": "receiver", "endpoint": "[::]:4318"}
+2026-05-11T20:37:28.871Z        info    service@v0.151.0/service.go:264 Everything is ready. Begin running and processing data. {"resource": {"service.instance.id": "4c74b8a2-4cfd-41c8-b565-41aee7c083c2", "service.name": "otelcol-contrib", "service.version": "0.151.0"}}
+2026-05-11T20:38:13.674Z        info    Metrics {"resource": {"service.instance.id": "4c74b8a2-4cfd-41c8-b565-41aee7c083c2", "service.name": "otelcol-contrib", "service.version": "0.151.0"}, "otelcol.component.id": "debug", "otelcol.component.kind": "exporter", "otelcol.signal": "metrics", "resource metrics": 1, "metrics": 8, "data points": 17}
+2026-05-11T20:38:13.682Z        info    ResourceMetrics #0
+Resource SchemaURL:
+Resource attributes:
+     -> service.name: Str(rtostwin-bridge)
+ScopeMetrics #0
+ScopeMetrics SchemaURL:
+InstrumentationScope rtostwin.bridge
+Metric #0
+Descriptor:
+     -> Name: rtos.heap.free_bytes
+     -> Description: Current free heap bytes
+     -> Unit: By
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 127912
+Metric #1
+Descriptor:
+     -> Name: rtos.heap.min_ever_bytes
+     -> Description: Historical minimum free heap bytes
+     -> Unit: By
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 127912
+Metric #2
+Descriptor:
+     -> Name: rtos.heap.oom_projection_seconds
+     -> Description: Projected seconds to OOM (-1 = stable)
+     -> Unit: s
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 1279.205983
+Metric #3
+Descriptor:
+     -> Name: rtos.cpu.utilization_ratio
+     -> Description: Total CPU utilization fraction 0.0-1.0
+     -> Unit: 1
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 0.200000
+Metric #4
+Descriptor:
+     -> Name: rtos.telemetry.packet_loss_ratio
+     -> Description: Fraction of telemetry packets dropped
+     -> Unit: 1
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 0.000000
+Metric #5
+Descriptor:
+     -> Name: rtos.task.state
+     -> Description: 1 if task is in this state, 0 otherwise
+     -> Unit: 1
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(SensorTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 2
+NumberDataPoints #1
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(CommsTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 2
+NumberDataPoints #2
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(ProcTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 1
+NumberDataPoints #3
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(IDLE)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 0
+Metric #6
+Descriptor:
+     -> Name: rtos.task.stack_watermark
+     -> Description: Stack bytes remaining above the stack pointer
+     -> Unit: By
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(SensorTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 2048
+NumberDataPoints #1
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(CommsTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 1536
+NumberDataPoints #2
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(ProcTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 1024
+NumberDataPoints #3
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(IDLE)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 512
+Metric #7
+Descriptor:
+     -> Name: rtos.task.cpu_ratio
+     -> Description: Per-task CPU utilization fraction 0.0-1.0
+     -> Unit: 1
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(SensorTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 0.010070
+NumberDataPoints #1
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(CommsTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 0.008056
+NumberDataPoints #2
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(ProcTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 0.015106
+NumberDataPoints #3
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(IDLE)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Value: 0.966767
+        {"resource": {"service.instance.id": "4c74b8a2-4cfd-41c8-b565-41aee7c083c2", "service.name": "otelcol-contrib", "service.version": "0.151.0"}, "otelcol.component.id": "debug", "otelcol.component.kind": "exporter", "otelcol.signal": "metrics"}
+2026-05-11T20:38:43.830Z        info    Metrics {"resource": {"service.instance.id": "4c74b8a2-4cfd-41c8-b565-41aee7c083c2", "service.name": "otelcol-contrib", "service.version": "0.151.0"}, "otelcol.component.id": "debug", "otelcol.component.kind": "exporter", "otelcol.signal": "metrics", "resource metrics": 1, "metrics": 9, "data points": 18}
+2026-05-11T20:38:43.835Z        info    ResourceMetrics #0
+Resource SchemaURL:
+Resource attributes:
+     -> service.name: Str(rtostwin-bridge)
+ScopeMetrics #0
+ScopeMetrics SchemaURL:
+InstrumentationScope rtostwin.bridge
+Metric #0
+Descriptor:
+     -> Name: rtos.heap.free_bytes
+     -> Description: Current free heap bytes
+     -> Unit: By
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 124922
+Metric #1
+Descriptor:
+     -> Name: rtos.heap.min_ever_bytes
+     -> Description: Historical minimum free heap bytes
+     -> Unit: By
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 124922
+Metric #2
+Descriptor:
+     -> Name: rtos.heap.oom_projection_seconds
+     -> Description: Projected seconds to OOM (-1 = stable)
+     -> Unit: s
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 1261.449597
+Metric #3
+Descriptor:
+     -> Name: rtos.cpu.utilization_ratio
+     -> Description: Total CPU utilization fraction 0.0-1.0
+     -> Unit: 1
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 0.200000
+Metric #4
+Descriptor:
+     -> Name: rtos.telemetry.packet_loss_ratio
+     -> Description: Fraction of telemetry packets dropped
+     -> Unit: 1
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 0.000000
+Metric #5
+Descriptor:
+     -> Name: rtos.task.state
+     -> Description: 1 if task is in this state, 0 otherwise
+     -> Unit: 1
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(SensorTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 2
+NumberDataPoints #1
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(CommsTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 2
+NumberDataPoints #2
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(ProcTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 1
+NumberDataPoints #3
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(IDLE)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 0
+Metric #6
+Descriptor:
+     -> Name: rtos.task.stack_watermark
+     -> Description: Stack bytes remaining above the stack pointer
+     -> Unit: By
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(SensorTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 2048
+NumberDataPoints #1
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(CommsTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 1536
+NumberDataPoints #2
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(ProcTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 1024
+NumberDataPoints #3
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(IDLE)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 512
+Metric #7
+Descriptor:
+     -> Name: rtos.task.cpu_ratio
+     -> Description: Per-task CPU utilization fraction 0.0-1.0
+     -> Unit: 1
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(SensorTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 0.010070
+NumberDataPoints #1
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(CommsTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 0.008056
+NumberDataPoints #2
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(ProcTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 0.015106
+NumberDataPoints #3
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(IDLE)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Value: 0.966767
+ScopeMetrics #1
+ScopeMetrics SchemaURL:
+InstrumentationScope opentelemetry-sdk
+Metric #0
+Descriptor:
+     -> Name: otel.sdk.metric_reader.collection.duration
+     -> Description: The duration of the collect operation of the metric reader.
+     -> Unit: s
+     -> DataType: Histogram
+     -> AggregationTemporality: Cumulative
+HistogramDataPoints #0
+Data point attributes:
+     -> otel.component.type: Str(periodic_metric_reader)
+     -> otel.component.name: Str(periodic_metric_reader/1)
+StartTimestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Timestamp: 2026-05-11 20:38:43.6124644 +0000 UTC
+Count: 1
+Sum: 0.001596
+Min: 0.001596
+Max: 0.001596
+ExplicitBounds #0: 0.000000
+ExplicitBounds #1: 5.000000
+ExplicitBounds #2: 10.000000
+ExplicitBounds #3: 25.000000
+ExplicitBounds #4: 50.000000
+ExplicitBounds #5: 75.000000
+ExplicitBounds #6: 100.000000
+ExplicitBounds #7: 250.000000
+ExplicitBounds #8: 500.000000
+ExplicitBounds #9: 750.000000
+ExplicitBounds #10: 1000.000000
+ExplicitBounds #11: 2500.000000
+ExplicitBounds #12: 5000.000000
+ExplicitBounds #13: 7500.000000
+ExplicitBounds #14: 10000.000000
+Buckets #0, Count: 0
+Buckets #1, Count: 1
+Buckets #2, Count: 0
+Buckets #3, Count: 0
+Buckets #4, Count: 0
+Buckets #5, Count: 0
+Buckets #6, Count: 0
+Buckets #7, Count: 0
+Buckets #8, Count: 0
+Buckets #9, Count: 0
+Buckets #10, Count: 0
+Buckets #11, Count: 0
+Buckets #12, Count: 0
+Buckets #13, Count: 0
+Buckets #14, Count: 0
+Buckets #15, Count: 0
+        {"resource": {"service.instance.id": "4c74b8a2-4cfd-41c8-b565-41aee7c083c2", "service.name": "otelcol-contrib", "service.version": "0.151.0"}, "otelcol.component.id": "debug", "otelcol.component.kind": "exporter", "otelcol.signal": "metrics"}
+2026-05-11T20:39:13.959Z        info    Metrics {"resource": {"service.instance.id": "4c74b8a2-4cfd-41c8-b565-41aee7c083c2", "service.name": "otelcol-contrib", "service.version": "0.151.0"}, "otelcol.component.id": "debug", "otelcol.component.kind": "exporter", "otelcol.signal": "metrics", "resource metrics": 1, "metrics": 9, "data points": 18}
+2026-05-11T20:39:13.959Z        info    ResourceMetrics #0
+Resource SchemaURL:
+Resource attributes:
+     -> service.name: Str(rtostwin-bridge)
+ScopeMetrics #0
+ScopeMetrics SchemaURL:
+InstrumentationScope rtostwin.bridge
+Metric #0
+Descriptor:
+     -> Name: rtos.heap.free_bytes
+     -> Description: Current free heap bytes
+     -> Unit: By
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 121932
+Metric #1
+Descriptor:
+     -> Name: rtos.heap.min_ever_bytes
+     -> Description: Historical minimum free heap bytes
+     -> Unit: By
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 121932
+Metric #2
+Descriptor:
+     -> Name: rtos.heap.oom_projection_seconds
+     -> Description: Projected seconds to OOM (-1 = stable)
+     -> Unit: s
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 1230.092848
+Metric #3
+Descriptor:
+     -> Name: rtos.cpu.utilization_ratio
+     -> Description: Total CPU utilization fraction 0.0-1.0
+     -> Unit: 1
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 0.200000
+Metric #4
+Descriptor:
+     -> Name: rtos.telemetry.packet_loss_ratio
+     -> Description: Fraction of telemetry packets dropped
+     -> Unit: 1
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 0.000000
+Metric #5
+Descriptor:
+     -> Name: rtos.task.state
+     -> Description: 1 if task is in this state, 0 otherwise
+     -> Unit: 1
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(SensorTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 2
+NumberDataPoints #1
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(CommsTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 2
+NumberDataPoints #2
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(ProcTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 1
+NumberDataPoints #3
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(IDLE)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 0
+Metric #6
+Descriptor:
+     -> Name: rtos.task.stack_watermark
+     -> Description: Stack bytes remaining above the stack pointer
+     -> Unit: By
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(SensorTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 2048
+NumberDataPoints #1
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(CommsTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 1536
+NumberDataPoints #2
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(ProcTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 1024
+NumberDataPoints #3
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(IDLE)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 512
+Metric #7
+Descriptor:
+     -> Name: rtos.task.cpu_ratio
+     -> Description: Per-task CPU utilization fraction 0.0-1.0
+     -> Unit: 1
+     -> DataType: Gauge
+NumberDataPoints #0
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(SensorTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 0.010070
+NumberDataPoints #1
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(CommsTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 0.008056
+NumberDataPoints #2
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(ProcTask)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 0.015106
+NumberDataPoints #3
+Data point attributes:
+     -> device_id: Str(mock-leak-otlp)
+     -> task_name: Str(IDLE)
+StartTimestamp: 1970-01-01 00:00:00 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Value: 0.966767
+ScopeMetrics #1
+ScopeMetrics SchemaURL:
+InstrumentationScope opentelemetry-sdk
+Metric #0
+Descriptor:
+     -> Name: otel.sdk.metric_reader.collection.duration
+     -> Description: The duration of the collect operation of the metric reader.
+     -> Unit: s
+     -> DataType: Histogram
+     -> AggregationTemporality: Cumulative
+HistogramDataPoints #0
+Data point attributes:
+     -> otel.component.type: Str(periodic_metric_reader)
+     -> otel.component.name: Str(periodic_metric_reader/1)
+StartTimestamp: 2026-05-11 20:38:13.4454255 +0000 UTC
+Timestamp: 2026-05-11 20:39:13.6356641 +0000 UTC
+Count: 2
+Sum: 0.002170
+Min: 0.000573
+Max: 0.001596
+ExplicitBounds #0: 0.000000
+ExplicitBounds #1: 5.000000
+ExplicitBounds #2: 10.000000
+ExplicitBounds #3: 25.000000
+ExplicitBounds #4: 50.000000
+ExplicitBounds #5: 75.000000
+ExplicitBounds #6: 100.000000
+ExplicitBounds #7: 250.000000
+ExplicitBounds #8: 500.000000
+ExplicitBounds #9: 750.000000
+ExplicitBounds #10: 1000.000000
+ExplicitBounds #11: 2500.000000
+ExplicitBounds #12: 5000.000000
+ExplicitBounds #13: 7500.000000
+ExplicitBounds #14: 10000.000000
+Buckets #0, Count: 0
+Buckets #1, Count: 2
+Buckets #2, Count: 0
+Buckets #3, Count: 0
+Buckets #4, Count: 0
+Buckets #5, Count: 0
+Buckets #6, Count: 0
+Buckets #7, Count: 0
+Buckets #8, Count: 0
+Buckets #9, Count: 0
+Buckets #10, Count: 0
+Buckets #11, Count: 0
+Buckets #12, Count: 0
+Buckets #13, Count: 0
+Buckets #14, Count: 0
+Buckets #15, Count: 0
+        {"resource": {"service.instance.id": "4c74b8a2-4cfd-41c8-b565-41aee7c083c2", "service.name": "otelcol-contrib", "service.version": "0.151.0"}, "otelcol.component.id": "debug", "otelcol.component.kind": "exporter", "otelcol.signal": "metrics"}
+PS C:\Users\rayan> Select-String -Path D:\digital_twin\evidence\objective3_oom_validation\05_mock_leak_otlp_collector.txt -Pattern 'rtos.heap.oom_projection_seconds','mock-leak-otlp'
+PS C:\Users\rayan>

@@ -1,8 +1,36 @@
-# RTOSTwin — RTOS Digital Twin & Observability Bridge
+# Validated Implementation Subtree
 
-**RTOSTwin** is a low-overhead observability agent for FreeRTOS and a Python bridge that transforms embedded telemetry into real-time Grafana dashboards across `NUCLEO-F401RE`, `ESP32-P4`, and `Teensy 4.1`.
+This subtree contains the current validated RTOSTwin implementation lane.
+
+It is retained under `vnv_final/` for compatibility with:
+
+- validated bridge commands
+- local Docker/Grafana/Prometheus bring-up
+- hardware validation documents
+- Objective 1/2/3 evidence and runbooks
+
+If you want the project overview, milestone status, or evidence links, start at
+the repository root [README.md](../README.md).
+
+If you want the currently supported implementation workflow, continue below.
 
 ![RTOSTwin Architecture](dashboard/architecture_diagram.png)
+
+## What Lives Here
+
+- `agent/` - MCU-side telemetry implementation
+- `bridge/` - Python bridge, exporters, and tests
+- `dashboard/` - dashboard assets
+- `docs/` - validated implementation quick start and VNV-scoped status
+- `semantic-conventions/` - RTOS OpenTelemetry proposal draft
+- `docker-compose.yml` - local observability stack bring-up
+
+## Start Here
+
+- [Embeddable agent guide](agent/README.md)
+- [Validated quick start](docs/quick_start.md)
+- [Hardware validation record](docs/reports/hardware_validation_2026-05-10.md)
+- [VNV verification boundary](docs/vnv_repo_completion_status.md)
 
 ## Hardware Validation Status
 
@@ -15,26 +43,19 @@ See
 [`docs/reports/hardware_validation_2026-05-10.md`](docs/reports/hardware_validation_2026-05-10.md)
 for the concrete build, flash, serial, and metrics evidence.
 
-## Features
+## Implementation Features
 
-- **🚀 Low-overhead agent:** Optimized C agent with delta encoding and board-specific transport backends.
-- **📉 95% Bandwidth Reduction:** Only sends changed fields between keyframes.
-- **🚨 OOM Prediction:** Python-side linear regression predicts heap exhaustion before it happens.
-- **📊 Modern Dashboards:** Pre-configured Grafana dashboard for task states, stack health, and memory.
-- **🔌 Multi-Exporter:** Push metrics to Prometheus or any OpenTelemetry (OTLP) backend.
+- Low-overhead embedded telemetry agent with delta encoding
+- Prometheus and OTLP exporter support in the host bridge
+- OOM trend analysis and projected out-of-memory metrics
+- Local Grafana and Prometheus bring-up for reproducible validation
 
-## Architecture
+## Workflow Scope
 
-1. **MCU Agent (C):** Hooks into FreeRTOS, encodes deltas, and streams over UART, USB CDC, or UDP depending on the board.
-2. **Python Bridge:** Decodes packets, maintains device state, and runs OOM analysis for one or more devices.
-3. **Observability Stack:** Prometheus stores metrics; Grafana visualizes the "Digital Twin".
+Use this subtree when you want to:
 
-## Quick Start
-
-See [docs/quick_start.md](docs/quick_start.md) to get running in 5 minutes.
-
-## Tech Stack
-
-- **Embedded:** C11, FreeRTOS, STM32 HAL, ESP-IDF, and Teensy/i.MX RT platform support.
-- **Bridge:** Python 3.9+, pyserial, scipy, prometheus-client, opentelemetry-sdk.
-- **Infrastructure:** Docker, Prometheus, Grafana.
+- run the bridge locally
+- exercise the mock device path
+- bring up the observability stack
+- follow the validated STM32 bridge path
+- inspect the current semantic-conventions proposal draft

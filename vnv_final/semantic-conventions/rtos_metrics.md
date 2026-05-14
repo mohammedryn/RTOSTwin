@@ -3,6 +3,33 @@
 
 This document defines semantic conventions for Real-Time Operating System (RTOS) metrics. These conventions allow for standardized monitoring of task-level and system-level health on microcontrollers running RTOS kernels like FreeRTOS, Zephyr, or ThreadX.
 
+## Proposal Surface Decision
+
+This proposal standardizes **OpenTelemetry-style semantic attribute names**,
+not the bridge's current implementation labels.
+
+The current bridge implementation emits attributes such as `device_id` and
+`task_name` in its local OTLP and Prometheus exporters. Those names are treated
+as an implementation detail of the first RTOSTwin bridge, not as the proposed
+cross-project standard.
+
+For the formal OpenTelemetry proposal, the standardized attribute names are:
+
+- `device.id`
+- `task.name`
+- `state`
+
+This keeps the proposal aligned with OpenTelemetry semantic naming style and
+makes it suitable for future RTOS exporters beyond this repository.
+
+### Compatibility Mapping
+
+| Current RTOSTwin Implementation | Proposed Semantic Convention |
+| :--- | :--- |
+| `device_id` | `device.id` |
+| `task_name` | `task.name` |
+| task state numeric value in exporter output | `rtos.task.state` with `state` attribute |
+
 ## 1. Metric Namespaces
 All RTOS metrics MUST be prefixed with `rtos.`.
 
@@ -18,7 +45,8 @@ These metrics track the overall health of the RTOS kernel and memory.
 | `rtos.telemetry.packet_loss_ratio` | Gauge | `1` | Fraction of telemetry packets dropped due to transport saturation or CRC errors. |
 
 ## 3. Task Metrics
-These metrics provide visibility into individual RTOS tasks. All task metrics MUST include the `task.name` attribute.
+These metrics provide visibility into individual RTOS tasks. All task metrics
+MUST include the `task.name` attribute.
 
 | Name | Instrument | Unit | Description |
 | :--- | :--- | :--- | :--- |
@@ -47,6 +75,17 @@ The operational state of the task.
   - `blocked`: The task is waiting for an event (semaphore, queue, etc.).
   - `suspended`: The task has been explicitly suspended.
   - `deleted`: The task has been terminated.
+
+### 4.4 State Encoding Rule
+
+`rtos.task.state` is proposed as a **one-hot gauge family**:
+
+- each emitted data point MUST include `device.id`, `task.name`, and `state`
+- the gauge value MUST be `1` for the active task state
+- the gauge value MUST be `0` for all other enumerated states
+
+This form is preferred over exporting a raw numeric task-state enum because it
+is easier to query, aggregate, and visualize consistently across backends.
 
 ## 5. Example
 An OTLP metric payload for `rtos.task.stack_watermark`:
